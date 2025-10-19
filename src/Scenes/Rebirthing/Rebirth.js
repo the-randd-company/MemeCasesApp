@@ -39,7 +39,7 @@ const RebirthScene = ({ money, updateMoney, onUpgradePurchased }) => {
     if (!canRebirth(wipedValue)) {
       Alert.alert(
         'Not Enough Value',
-        `You need $${REBIRTH_REQUIREMENT.toLocaleString()} in wipeable inventory value to rebirth.`,
+        `You need $${REBIRTH_REQUIREMENT.toLocaleString()} in wipeable inventory value to prestige.`,
         [{ text: 'OK' }]
       );
       return;
@@ -49,12 +49,12 @@ const RebirthScene = ({ money, updateMoney, onUpgradePurchased }) => {
     const newTotalMultiplier = (rebirthMultiplier + (multiplierGain - 1)).toFixed(2);
 
     Alert.alert(
-      'Confirm Rebirth',
+      'Confirm Prestige',
       `This will:\n• Wipe all common, rare, legendary, and mythic items\n• Reset ALL upgrades (case speed, clicker power)\n• Grant permanent ${multiplierGain.toFixed(2)}x click multiplier\n\nYour seasonal/vaulted items will be preserved.`,
       [
         { text: 'Cancel', style: 'cancel' },
         {
-          text: 'Rebirth',
+          text: 'Prestige',
           style: 'destructive',
           onPress: async () => {
             // Perform rebirth - only keep protected items
@@ -90,7 +90,7 @@ const RebirthScene = ({ money, updateMoney, onUpgradePurchased }) => {
             }
 
             Alert.alert(
-              'Rebirth Complete!',
+              'Prestige Complete!',
               `All upgrades have been reset to level 0!\nYour click power has been multiplied by ${multiplierGain.toFixed(2)}x!\nTotal multiplier: ${newTotalMultiplier}x`,
               [{ text: 'Awesome!' }]
             );
@@ -109,14 +109,14 @@ const RebirthScene = ({ money, updateMoney, onUpgradePurchased }) => {
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Rebirth</Text>
+        <Text style={styles.headerTitle}>👑 Prestige</Text>
         <View style={styles.statsRow}>
           <View style={styles.stat}>
             <Text style={styles.statLabel}>Multiplier</Text>
             <Text style={styles.statValue}>{rebirthMultiplier.toFixed(2)}x</Text>
           </View>
           <View style={styles.stat}>
-            <Text style={styles.statLabel}>Rebirths</Text>
+            <Text style={styles.statLabel}>Prestiges</Text>
             <Text style={styles.statValue}>{totalRebirths}</Text>
           </View>
         </View>
@@ -166,8 +166,8 @@ const RebirthScene = ({ money, updateMoney, onUpgradePurchased }) => {
         >
           {rebirthAvailable ? (
             <>
-              <Text style={styles.rebirthButtonIcon}>🔥</Text>
-              <Text style={styles.rebirthButtonText}>REBIRTH</Text>
+              <Text style={styles.rebirthButtonIcon}>👑</Text>
+              <Text style={styles.rebirthButtonText}>PRESTIGE</Text>
               <Text style={styles.rebirthButtonSubtext}>
                 Gain {multiplierGain.toFixed(2)}x Multiplier
               </Text>
@@ -191,7 +191,7 @@ const RebirthScene = ({ money, updateMoney, onUpgradePurchased }) => {
           onPress={() => setShowInfo(!showInfo)}
           activeOpacity={0.7}
         >
-          <Text style={styles.infoHeaderText}>Rebirth Info</Text>
+          <Text style={styles.infoHeaderText}>Prestige Info</Text>
           <Text style={styles.infoHeaderIcon}>{showInfo ? '▲' : '▼'}</Text>
         </TouchableOpacity>
 

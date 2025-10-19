@@ -13,13 +13,8 @@ import CaseShop from './src/Scenes/Shop';
 import ClickerButton from './src/ClickerButton';
 import UpgradesScene from './src/Scenes/Upgrades';
 import { getMoney, setMoney as setMoneyStorage, getUpgrades, fixCorruptedData } from './src/DataStorage';
-import RebirthScene from './src/Scenes/Rebirthing/Rebirth';
-
-const ProfileScene = () => (
-  <View style={styles.sceneContainer}>
-    <Text style={styles.sceneText}>Profile Scene</Text>
-  </View>
-);
+import PrestigeScene from './src/Scenes/Rebirthing/Rebirth';
+import InAppPurchaseShop from './src/Scenes/InAppPurchaseShop';
 
 const App = () => {
   const [mainScene, setMainScene] = useState('caseshop');
@@ -114,6 +109,11 @@ const App = () => {
     persistMoney(money + earnAmount);
   };
 
+  const handleMoneyPress = () => {
+    setOpeningCase(false);
+    setMainScene('shop');
+  };
+
   const renderScene = () => {
     if (openingCase) {
       return (
@@ -137,10 +137,11 @@ const App = () => {
         return <CaseShop money={money} updateMoney={updateMoney} onCaseBought={openCaseFromShop} />;
       case 'upgrades':
         return <UpgradesScene money={money} updateMoney={updateMoney} onUpgradePurchased={loadUpgrades} />;
-      case 'rebirth':
-        return <RebirthScene money={money} updateMoney={updateMoney} onUpgradePurchased={loadUpgrades} />;
+      case 'prestige':
+        return <PrestigeScene money={money} updateMoney={updateMoney} onUpgradePurchased={loadUpgrades} />;
       case 'profile':
-        return <ProfileScene />;
+      case 'shop':
+        return <InAppPurchaseShop />;
       default:
         return <CaseShop money={money} updateMoney={updateMoney} onCaseBought={openCaseFromShop} />;
     }
@@ -149,7 +150,7 @@ const App = () => {
   return (
     <SafeAreaView style={styles.container}>
       {/* Top bar */}
-      <TopBar money={money} />
+      <TopBar money={money} onMoneyPress={handleMoneyPress} />
 
       {/* Main content area */}
       <View style={styles.content}>
@@ -166,11 +167,16 @@ const App = () => {
 
       {/* Bottom navigation bar */}
       <BottomNavBar
-        activeScene={mainScene}
+        activeScene={mainScene === 'shop' ? 'profile' : mainScene}
         onSceneChange={key => {
           if (key === 'cases') {
             setOpeningCase(false);
             setMainScene('caseshop');
+            return;
+          }
+          if (key === 'profile') {
+            setOpeningCase(false);
+            setMainScene('shop');
             return;
           }
           if (openingCase) {

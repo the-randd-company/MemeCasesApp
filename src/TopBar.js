@@ -1,7 +1,7 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 
-const TopBar = ({ money }) => {
+const TopBar = ({ money, onMoneyPress }) => {
   const formatMoney = (amount) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -14,10 +14,14 @@ const TopBar = ({ money }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Case Opener</Text>
-      <View style={styles.moneyContainer}>
+      <TouchableOpacity 
+        style={styles.moneyContainer}
+        onPress={onMoneyPress}
+        activeOpacity={0.7}
+      >
         <Text style={styles.moneyIcon}>💰</Text>
         <Text style={styles.moneyText}>{formatMoney(money)}</Text>
-      </View>
+      </TouchableOpacity>
     </View>
   );
 };

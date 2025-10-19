@@ -52,9 +52,9 @@ const BottomNavBar = ({ activeScene, onSceneChange }) => {
         onPress={onSceneChange}
       />
       <NavButton
-        icon="🔥"
-        label="Rebirth"
-        scene="rebirth"
+        icon="👑"
+        label="Prestige"
+        scene="prestige"
         activeScene={activeScene}
         onPress={onSceneChange}
       />

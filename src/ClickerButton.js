@@ -179,9 +179,6 @@ const ClickerButton = ({
         >
           <Text style={styles.clickerLabel}>
             💸 Tap for +${totalClickValue}!
-            {rebirthMultiplier > 1 && (
-              <Text style={styles.multiplierText}> ({rebirthMultiplier.toFixed(2)}x)</Text>
-            )}
           </Text>
           {autoClickPower > 0 && (
             <Text style={styles.autoClickInfo}>
