@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   View,
   Text,
@@ -12,9 +12,33 @@ import InventoryScene from './src/Scenes/Inventory';
 import CaseShop from './src/Scenes/Shop';
 import ClickerButton from './src/ClickerButton';
 import UpgradesScene from './src/Scenes/Upgrades';
-import { getMoney, setMoney as setMoneyStorage, getUpgrades, fixCorruptedData } from './src/DataStorage';
+import { getMoney, setMoney as setMoneyStorage, getUpgrades, fixCorruptedData, resetAllData } from './src/DataStorage';
 import PrestigeScene from './src/Scenes/Rebirthing/Rebirth';
 import InAppPurchaseShop from './src/Scenes/InAppPurchaseShop';
+import useAppImagePreloader from './src/utils/AppImagePreloader';
+
+// Improved formatMoney function with better NaN protection
+const formatMoney = (amount) => {
+  let num = Number(amount);
+
+  if (isNaN(num) || !isFinite(num) || num <= 0) return '0';
+  if (num < 1000) return Math.floor(num).toString();
+
+  const suffixes = ['', 'K', 'M', 'B', 'T', 'Qa', 'Qi', 'Sx', 'Sp', 'Oc', 'No'];
+
+  let tier = Math.floor(Math.log10(num) / 3);
+  if (tier >= suffixes.length) tier = suffixes.length - 1;
+
+  const scale = num / Math.pow(10, tier * 3);
+  let formatted = scale.toFixed(3); // Always 3 decimal places initially
+
+  // Remove trailing zeros and possible leftover decimal point
+  formatted = formatted.replace(/\.?0+$/, '');
+
+  return formatted + suffixes[tier];
+};
+
+
 
 const App = () => {
   const [mainScene, setMainScene] = useState('caseshop');
@@ -22,6 +46,7 @@ const App = () => {
   const [openingCase, setOpeningCase] = useState(false);
   const [showResult, setShowResult] = useState(false);
   const [currentCase, setCurrentCase] = useState(null);
+  const [isSpinning, setIsSpinning] = useState(false);
 
   // Upgrade states
   const [clickerPower, setClickerPower] = useState(1);
@@ -29,36 +54,80 @@ const App = () => {
   const [rebirthMultiplier, setRebirthMultiplier] = useState(1);
   const [autoClickPower, setAutoClickPower] = useState(0);
 
+  // Call the hook at the top level of the component
+  useAppImagePreloader();
+
   // Load money and upgrades on app start with corruption fix
   useEffect(() => {
     initializeApp();
   }, []);
 
   const initializeApp = async () => {
-    // First fix any corrupted data
-    await fixCorruptedData();
-    
-    // Then load the corrected data
-    await loadMoney();
-    await loadUpgrades();
+    try {
+      // First fix any corrupted data
+      await fixCorruptedData();
+      
+      // Then load the corrected data
+      await loadMoney();
+      await loadUpgrades();
+    } catch (error) {
+      console.error('Error initializing app:', error);
+      // Set default money if initialization fails
+      setMoney(1000);
+    }
   };
 
   const loadMoney = async () => {
-    const currentMoney = await getMoney();
-    setMoney(currentMoney);
+    try {
+      const currentMoney = await getMoney();
+      // Ensure we have a valid number
+      const validatedMoney = Number(currentMoney);
+      if (isNaN(validatedMoney) || !isFinite(validatedMoney)) {
+        console.warn('Invalid money value loaded, resetting to 1000');
+        setMoney(1000);
+        await setMoneyStorage(1000);
+      } else {
+        setMoney(validatedMoney);
+      }
+    } catch (error) {
+      console.error('Error loading money:', error);
+      setMoney(1000);
+    }
   };
 
-  // Helper to persist both memory and storage
+  // Helper to persist both memory and storage with validation
   const persistMoney = async (newAmount) => {
-    setMoney(newAmount);
-    await setMoneyStorage(newAmount);
+    try {
+      const validatedAmount = Number(newAmount);
+      if (isNaN(validatedAmount) || !isFinite(validatedAmount)) {
+        console.error('Attempted to set invalid money value:', newAmount);
+        return;
+      }
+      
+      setMoney(validatedAmount);
+      await setMoneyStorage(validatedAmount);
+    } catch (error) {
+      console.error('Error persisting money:', error);
+    }
+  };
+
+  const handleResetAllData = async () => {
+    try {
+      await resetAllData();
+      // After resetting, reload the data to update the state
+      await loadMoney();
+      await loadUpgrades();
+      console.log('All data reset and state updated');
+    } catch (error) {
+      console.error('Error resetting data:', error);
+    }
   };
 
   const openCaseFromShop = (caseData) => {
-    console.log('Opening case:', caseData); // Debug log
+    console.log('Opening case:', caseData);
     setCurrentCase(caseData);
     setOpeningCase(true);
-    setMainScene('caseopening'); // Set a dedicated scene for case opening
+    setMainScene('caseopening');
   };
 
   // Handlers after roll result actions
@@ -69,45 +138,87 @@ const App = () => {
   
   const handleSell = () => {
     setOpeningCase(false);
-    setMainScene('caseshop'); // Return to shop after selling
+    setMainScene('caseshop');
   };
   
   const handleFinish = () => {
     setOpeningCase(false);
-    setMainScene('caseshop'); // Return to shop after finishing
+    setMainScene('caseshop');
   };
 
-  // Instead of setMoney, use persistMoney in these functions
+  // Handle spinning state changes from ScrollFrame
+  const handleSpinningChange = (spinning) => {
+    setIsSpinning(spinning);
+  };
+
   const updateMoney = (newAmount) => {
     persistMoney(newAmount);
   };
 
   const handleEarnMoney = async (amount) => {
     if (!amount) return;
-    const newMoney = money + amount;
-    setMoney(newMoney);
-    await setMoneyStorage(newMoney); // Ensure immediate persistence
+    
+    const validatedAmount = Number(amount);
+    if (isNaN(validatedAmount) || !isFinite(validatedAmount)) {
+      console.error('Invalid earn amount:', amount);
+      return;
+    }
+    
+    const newMoney = money + validatedAmount;
+    await persistMoney(newMoney);
   };
 
   // Load upgrades including auto clicker
   const loadUpgrades = async () => {
-    const upgrades = await getUpgrades();
-    setClickerPower(1 + upgrades.clickerPower);
-    setRebirthMultiplier(upgrades.rebirthMultiplier || 1);
-    setAutoClickPower(upgrades.autoClickPower || 0);
-    
-    // Calculate case speed: 10 - (upgrades * 0.1), minimum 3.5
-    const baseSpeed = 10;
-    const reduction = upgrades.caseSpeed * 0.1;
-    const newSpeed = Math.max(3.5, baseSpeed - reduction);
-    setCaseSpeed(newSpeed);
+    try {
+      const upgrades = await getUpgrades();
+      
+      // Validate and set upgrades with defaults
+      setClickerPower(1 + (Number(upgrades.clickerPower) || 0));
+      setRebirthMultiplier(Number(upgrades.rebirthMultiplier) || 1);
+      setAutoClickPower(Number(upgrades.autoClickPower) || 0);
+      
+      const baseSpeed = 10;
+      const reduction = (Number(upgrades.caseSpeed) || 0) * 0.1;
+      const newSpeed = Math.max(3.5, baseSpeed - reduction);
+      setCaseSpeed(newSpeed);
+    } catch (error) {
+      console.error('Error loading upgrades:', error);
+      // Set default values if loading fails
+      setClickerPower(1);
+      setRebirthMultiplier(1);
+      setAutoClickPower(0);
+      setCaseSpeed(10);
+    }
   };
 
-  const handleClickerPress = () => {
-    // Apply rebirth multiplier to clicker earnings
-    const earnAmount = Math.floor(clickerPower * rebirthMultiplier);
-    persistMoney(money + earnAmount);
-  };
+  // FIXED: Use functional state updates to avoid stale closure
+  const handleClickerPress = useCallback((amount) => {
+    if (!amount || isNaN(amount) || !isFinite(amount)) return;
+    
+    setMoney(prevMoney => {
+      const newMoney = prevMoney + amount;
+      // Async persist without blocking
+      setMoneyStorage(newMoney).catch(error => {
+        console.error('Error persisting click money:', error);
+      });
+      return newMoney;
+    });
+  }, []);
+
+  // FIXED: Use functional state updates to avoid stale closure
+  const handleAutoClickEarnings = useCallback((amount) => {
+    if (!amount || isNaN(amount) || !isFinite(amount)) return;
+  
+    setMoney(prevMoney => {
+      const newMoney = prevMoney + amount;
+      // Async persist without blocking
+      setMoneyStorage(newMoney).catch(error => {
+        console.error('Error persisting auto-click money:', error);
+      });
+      return newMoney;
+    });
+  }, []);
 
   const handleMoneyPress = () => {
     setOpeningCase(false);
@@ -126,6 +237,7 @@ const App = () => {
           onShowResultChange={setShowResult} 
           caseSpeed={caseSpeed} 
           caseData={currentCase} 
+          onSpinningChange={handleSpinningChange}
         />
       );
     }
@@ -149,21 +261,24 @@ const App = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Top bar */}
-      <TopBar money={money} onMoneyPress={handleMoneyPress} />
+      {/* Top bar with formatted money - now safely formatted */}
+      <TopBar money={formatMoney(money)} onMoneyPress={handleMoneyPress} />
 
       {/* Main content area */}
       <View style={styles.content}>
         {renderScene()}
       </View>
 
-      {/* Clicker button with auto clicker functionality */}
-      <ClickerButton 
-        onPress={handleClickerPress} 
-        clickerPower={clickerPower}
-        rebirthMultiplier={rebirthMultiplier}
-        autoClickPower={autoClickPower}
-      />
+      {/* Clicker button with auto clicker functionality - Hidden when spinning */}
+      {!isSpinning && (
+        <ClickerButton 
+          onPress={handleClickerPress} 
+          onAutoClick={handleAutoClickEarnings} 
+          clickerPower={clickerPower}
+          rebirthMultiplier={rebirthMultiplier}
+          autoClickPower={autoClickPower}
+        />
+      )}
 
       {/* Bottom navigation bar */}
       <BottomNavBar

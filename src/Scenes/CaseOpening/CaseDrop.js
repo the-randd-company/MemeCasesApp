@@ -1,13 +1,45 @@
-import React from 'react';
-import { View, StyleSheet, Image } from 'react-native';
+// CaseDrop.js
+import React, { useState, useMemo } from 'react';
+import { View, StyleSheet, Image, Animated } from 'react-native';
+import imageCache from '../../utils/ImageCache';
 
-const CaseDrop = ({ dropImage }) => {
-  let source;
-  if (typeof dropImage.imageSrc === 'number') {
-    source = dropImage.imageSrc;
-  } else {
-    source = { uri: dropImage.imageSrc };
-  }
+const CaseDrop = React.memo(({ dropImage }) => {
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageError, setImageError] = useState(false);
+  const fadeAnim = useState(new Animated.Value(1))[0]; // Start visible if preloaded
+
+  const imageSource = useMemo(() => {
+    const source = imageCache.getImageSource(dropImage.imageSrc);
+    
+    // If image is already in cache, mark as loaded immediately
+    if (imageCache.isImageLoaded(dropImage.imageSrc)) {
+      setImageLoaded(true);
+    }
+    
+    return source;
+  }, [dropImage.imageSrc]);
+
+  const handleImageLoad = () => {
+    setImageLoaded(true);
+    // Only animate if it wasn't preloaded
+    if (!imageCache.isImageLoaded(dropImage.imageSrc)) {
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 200,
+        useNativeDriver: true,
+      }).start();
+    }
+  };
+
+  const handleImageError = (error) => {
+    console.log('Image loading error:', error);
+    setImageError(true);
+    setImageLoaded(true); // Still show the container even if image fails
+  };
+
+  // Show loading state only if image is not in cache
+  const showLoading = !imageLoaded && !imageCache.isImageLoaded(dropImage.imageSrc);
+
   return (
     <View 
       style={[
@@ -18,15 +50,31 @@ const CaseDrop = ({ dropImage }) => {
         }
       ]}
     >
-      <Image 
-        source={source}
-        style={styles.dropImage}
+      <Animated.Image 
+        source={imageSource}
+        style={[
+          styles.dropImage,
+          { opacity: fadeAnim }
+        ]}
         resizeMode="contain"
-        onError={(error) => console.log('Image loading error:', error)}
+        resizeMethod="scale"
+        onLoad={handleImageLoad}
+        onError={handleImageError}
+        fadeDuration={100}
       />
+      {showLoading && (
+        <View style={styles.placeholder}>
+          <View style={styles.loadingSpinner} />
+        </View>
+      )}
+      {imageError && (
+        <View style={styles.placeholder}>
+          <Text style={styles.errorText}>!</Text>
+        </View>
+      )}
     </View>
   );
-};
+});
 
 const styles = StyleSheet.create({
   container: {
@@ -37,10 +85,32 @@ const styles = StyleSheet.create({
     height: 120,
     justifyContent: 'center',
     alignItems: 'center',
+    overflow: 'hidden',
   },
   dropImage: {
     width: '100%',
     height: '100%',
+  },
+  placeholder: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.1)',
+  },
+  loadingSpinner: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    borderWidth: 2,
+    borderColor: '#ffffff',
+    borderTopColor: 'transparent',
+  },
+  errorText: {
+    color: '#ffffff',
+    fontSize: 24,
+    fontWeight: 'bold',
   },
 });
 

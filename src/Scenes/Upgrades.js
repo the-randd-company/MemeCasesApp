@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { getMoney, setMoney as setMoneyStorage, getUpgrades, setUpgrades } from '../DataStorage';
+import { getMoney, setMoney as setMoneyStorage, getUpgrades, setUpgrades, resetAllData} from '../DataStorage';
 
 const UpgradesScene = ({ money, updateMoney, onUpgradePurchased }) => {
   const [upgrades, setUpgradesState] = useState({
@@ -63,7 +63,7 @@ const UpgradesScene = ({ money, updateMoney, onUpgradePurchased }) => {
       name: 'Case Opening Speed',
       description: `Reduces case opening time by 0.1s (Current: ${getCaseSpeedDuration().toFixed(1)}s)`,
       baseCost: 50,
-      costMultiplier: 1.5,
+      costMultiplier: 1.25,
       currentLevel: upgrades.caseSpeed,
       maxLevel: 65, // Max 6.5 seconds reduction (0.1 * 65 = 6.5s, so 10 - 6.5 = 3.5s minimum)
     },
@@ -72,18 +72,18 @@ const UpgradesScene = ({ money, updateMoney, onUpgradePurchased }) => {
       name: 'Clicker Power',
       description: `Increases money per click by +1 (Current: +${getClickerPower()})`,
       baseCost: 100,
-      costMultiplier: 1.25,
+      costMultiplier: 1.05,
       currentLevel: upgrades.clickerPower,
       maxLevel: Infinity, // No maximum limit
     },
     {
         id: 'autoClickPower',
         name: 'Auto Clicker',
-        description: `Multiplies auto-click earnings (Current: ${getAutoClickPower()}x every 5 seconds)`,
-        baseCost: 250,
-        costMultiplier: 1.5,
+        description: `Multiplies auto-click earnings (Current: ${getAutoClickPower()}x every 10 seconds)`,
+        baseCost: 500,
+        costMultiplier: 1.35,
         currentLevel: upgrades.autoClickPower,
-        maxLevel: 20,
+        maxLevel: Infinity,
     },
   ];
 

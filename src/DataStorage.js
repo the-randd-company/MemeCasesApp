@@ -8,6 +8,45 @@ const STORAGE_KEYS = {
   TOTAL_REBIRTHS: '@total_rebirths',
 };
 
+
+// Reset all data to default values
+export const resetAllData = async () => {
+  try {
+    console.log('Resetting all data to defaults...');
+    
+    // Reset money to default (1000 as per your getMoney function)
+    await AsyncStorage.setItem(STORAGE_KEYS.MONEY, '1000');
+    
+    // Reset inventory to empty array
+    await AsyncStorage.setItem(STORAGE_KEYS.INVENTORY, JSON.stringify([]));
+    
+    // Reset upgrades to default values
+    const defaultUpgrades = {
+      caseSpeed: 0,
+      clickerPower: 0,
+      autoClickPower: 0,
+      rebirthMultiplier: 1,
+      totalRebirths: 0,
+    };
+    await AsyncStorage.setItem(STORAGE_KEYS.UPGRADES, JSON.stringify(defaultUpgrades));
+    
+    // If you're using separate keys for rebirth data, reset those too
+    try {
+      await AsyncStorage.setItem(STORAGE_KEYS.REBIRTH_MULTIPLIER, '1');
+      await AsyncStorage.setItem(STORAGE_KEYS.TOTAL_REBIRTHS, '0');
+    } catch (error) {
+      console.log('Note: Separate rebirth keys not used or already handled in upgrades');
+    }
+    
+    console.log('All data reset successfully');
+    return true;
+  } catch (error) {
+    console.error('Error resetting all data:', error);
+    return false;
+  }
+};
+
+
 // Helper function to validate and fix numbers
 const validateNumber = (value, defaultValue = 0) => {
   if (value === null || value === undefined) return defaultValue;
@@ -44,7 +83,7 @@ export const getMoney = async () => {
 
 export const setMoney = async (amount) => {
   try {
-    const validAmount = validateNumber(amount, 0);
+    const validAmount = validateNumber(amount, 1000);
     await AsyncStorage.setItem(STORAGE_KEYS.MONEY, validAmount.toString());
     console.log('Money saved to storage:', validAmount); // Debug log
     return true;
@@ -57,8 +96,8 @@ export const setMoney = async (amount) => {
 export const addMoney = async (amount) => {
   try {
     const currentMoney = await getMoney();
-    const validAmount = validateNumber(amount, 0);
-    const newMoney = validateNumber(currentMoney + validAmount, 0);
+    const validAmount = validateNumber(amount, 1000);
+    const newMoney = validateNumber(currentMoney + validAmount, 1000);
     await setMoney(newMoney);
     return newMoney;
   } catch (error) {
@@ -70,9 +109,9 @@ export const addMoney = async (amount) => {
 export const subtractMoney = async (amount) => {
   try {
     const currentMoney = await getMoney();
-    const validAmount = validateNumber(amount, 0);
+    const validAmount = validateNumber(amount, 1000);
     if (currentMoney >= validAmount) {
-      const newMoney = validateNumber(currentMoney - validAmount, 0);
+      const newMoney = validateNumber(currentMoney - validAmount, 1000);
       await setMoney(newMoney);
       return newMoney;
     }
@@ -245,4 +284,5 @@ export default {
   setUpgrades,
   clearAllData,
   fixCorruptedData,
+  resetAllData,
 };

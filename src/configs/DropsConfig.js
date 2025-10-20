@@ -5,46 +5,54 @@
 
 const drops = [
   {
+    name: 'Snoop Dogg',
+    imageSrc: require('../img/memes/SnoopDogg.jpg'),
+    rarity: 'Common',
+    rarityColor: '#b8a01a',
+    value: 420,
+  },
+  {
     name: 'Pepe the Frog',
     imageSrc: require('../img/memes/PepeTheFrog.jpg'),
     rarity: 'Common',
     rarityColor: '#b8a01a',
-    value: 250,
+    value: 665,
   },
+  
   {
     name: 'Brain Overload',
     imageSrc: require('../img/memes/BrainOverload.jpg'),
     rarity: 'Common',
     rarityColor: '#b8a01a',
-    value: 650,
+    value: 1111,
   },
   {
     name: 'Overly Attached Girlfriend',
     imageSrc: require('../img/memes/OverlyAttachedGirlfriend.jpg'),
     rarity: 'Common',
     rarityColor: '#b8a01a',
-    value: 1000,
+    value: 1311,
   },
   {
     name: 'Drake Reacts No',
     imageSrc: require('../img/memes/DrakeReactsNo.jpg'),
     rarity: 'Uncommon',
-    rarityColor: '#4169e1',
-    value: 5000,
+    rarityColor: '#444400',
+    value: 5750,
   },
   {
     name: 'Grumpy Cat',
     imageSrc: require('../img/memes/GrumpyCat.jpg'),
     rarity: 'Uncommon',
-    rarityColor: '#4169e1',
-    value: 10000,
+    rarityColor: '#444400',
+    value: 8930,
   },
   {
     name: 'Success Kid',
     imageSrc: require('../img/memes/SuccessKid.jpg'),
     rarity: 'Uncommon',
-    rarityColor: '#4169e1',
-    value: 15000,
+    rarityColor: '#444400',
+    value: 14302,
   },
   
   {
@@ -52,14 +60,14 @@ const drops = [
     imageSrc: require('../img/memes/QuandaleDingle.jpg'),
     rarity: 'Rare',
     rarityColor: '#4169e1',
-    value: 50000,
+    value: 44489,
   },
   {
     name: 'Original Doge',
     imageSrc: require('../img/memes/OriginalDoge.jpg'),
     rarity: 'Rare',
     rarityColor: '#4169e1',
-    value: 100000,
+    value: 89000,
   },
   {
     name: 'This Is Fine',
@@ -79,7 +87,7 @@ const drops = [
     name: 'SixSeven Kid',
     imageSrc: require('../img/memes/SixSeven.jpg'),
     rarity: 'Mythic',
-    rarityColor: '#ef4444',
+    rarityColor: '#FF0000',
     value: 6750000,
   },{
     name: 'Bad Luck Brian',
@@ -92,7 +100,7 @@ const drops = [
     name: 'Troll Face',
     imageSrc: require('../img/memes/TrollFace.jpg'),
     rarity: 'Mythic',
-    rarityColor: '#ef4444',
+    rarityColor: '#FF0000',
     value: 9900000,
   },
 ];

@@ -6,7 +6,8 @@ const ClickerButton = ({
   earnAmount = 1, 
   clickerPower = 1, 
   rebirthMultiplier = 1,
-  autoClickPower = 0
+  autoClickPower = 0,
+  onAutoClick,
 }) => {
   const [plusOneEffects, setPlusOneEffects] = useState([]);
   const buttonScale = useRef(new Animated.Value(1)).current;
@@ -16,17 +17,6 @@ const ClickerButton = ({
 
   // Calculate total click value with rebirth multiplier
   const totalClickValue = Math.floor(clickerPower * rebirthMultiplier);
-
-  // Auto clicker functionality - Fixed interval with multiplied earnings
-  useEffect(() => {
-    if (autoClickPower <= 0) return;
-
-    const autoClickInterval = setInterval(() => {
-      handleAutoClick();
-    }, 5000); // Fixed 5 second interval
-
-    return () => clearInterval(autoClickInterval);
-  }, [autoClickPower, clickerPower, rebirthMultiplier, onPress]);
 
   const animatePlusOne = (isAutoClick = false, multiplier = 1) => {
     if (effectCount.current >= MAX_EFFECTS) {
@@ -77,42 +67,31 @@ const ClickerButton = ({
     });
   };
 
-  const handleAutoClick = () => {
-    if (autoClickPower <= 0) return;
+  // Auto clicker functionality
+  useEffect(() => {
+    if (autoClickPower <= 0 || !onAutoClick) return;
 
-    // Calculate total auto-click earnings (base click value multiplied by auto-click power)
-    const autoClickMultiplier = autoClickPower;
-    const totalAutoEarnings = totalClickValue * autoClickMultiplier;
+    const handleAutoClick = () => {
+      const autoClickMultiplier = autoClickPower;
+      const totalAutoEarnings = totalClickValue * autoClickMultiplier;
 
-    // Show appropriate animation
-    if (autoClickMultiplier > 1) {
-      // Show multiplier effect for high-value auto clicks
       animatePlusOne(true, autoClickMultiplier);
-    } else {
-      // Show normal effect for single clicks
-      if (Math.random() > 0.7 || plusOneEffects.length < 2) {
-        animatePlusOne(true, 1);
-      }
-    }
+      onAutoClick(totalAutoEarnings);
+    };
 
-    // Trigger the click multiple times based on auto-click power
-    // This ensures the money is added correctly through the existing onPress mechanism
-    for (let i = 0; i < autoClickMultiplier; i++) {
-      onPress();
-    }
-  };
+    const intervalId = setInterval(handleAutoClick, 10000);
+    return () => clearInterval(intervalId);
+  }, [autoClickPower, totalClickValue, onAutoClick]);
 
   const handlePress = () => {
     const now = Date.now();
     
-    // Throttle rapid clicks to prevent animation overload
     if (now - lastPressTime.current < 50) {
-      onPress();
+      onPress(totalClickValue);
       return;
     }
     lastPressTime.current = now;
 
-    // Quick scale animation
     buttonScale.setValue(0.92);
     Animated.spring(buttonScale, {
       toValue: 1,
@@ -121,16 +100,14 @@ const ClickerButton = ({
       useNativeDriver: true,
     }).start();
 
-    // Only show +1 effect occasionally during rapid clicking
     if (Math.random() > 0.3 || plusOneEffects.length < 3) {
       animatePlusOne(false, 1);
     }
 
-    onPress();
+    onPress(totalClickValue);
   };
 
-  // Clean up effects on unmount
-  React.useEffect(() => {
+  useEffect(() => {
     return () => {
       setPlusOneEffects([]);
       effectCount.current = 0;
@@ -139,7 +116,6 @@ const ClickerButton = ({
 
   return (
     <View style={styles.clickerWrapper}>
-      {/* Render all +1 effects */}
       {plusOneEffects.map((effect) => (
         <Animated.Text
           key={effect.id}
@@ -180,11 +156,6 @@ const ClickerButton = ({
           <Text style={styles.clickerLabel}>
             💸 Tap for +${totalClickValue}!
           </Text>
-          {autoClickPower > 0 && (
-            <Text style={styles.autoClickInfo}>
-              Auto: +${totalClickValue * autoClickPower} every 5s
-            </Text>
-          )}
         </Animated.View>
       </TouchableOpacity>
     </View>
@@ -248,11 +219,11 @@ const styles = StyleSheet.create({
     zIndex: 1000,
   },
   autoClickPlusOne: {
-    color: '#60a5fa', // Blue for auto clicks
+    color: '#60a5fa',
   },
   multiplierPlusOne: {
     fontSize: 20,
-    color: '#fbbf24', // Gold for multiplier clicks
+    color: '#fbbf24',
   },
   multiplierIndicator: {
     fontSize: 16,

@@ -20,7 +20,7 @@ const TopBar = ({ money, onMoneyPress }) => {
         activeOpacity={0.7}
       >
         <Text style={styles.moneyIcon}>💰</Text>
-        <Text style={styles.moneyText}>{formatMoney(money)}</Text>
+        <Text style={styles.moneyText}>{money}</Text>
       </TouchableOpacity>
     </View>
   );

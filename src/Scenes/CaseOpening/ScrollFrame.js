@@ -1,77 +1,75 @@
-import React, { useRef, useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Dimensions, Animated, Image } from 'react-native';
+// ScrollFrame.js
+import React, { useRef, useState, useEffect, useMemo } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Dimensions, Animated } from 'react-native';
 import CaseDrop from './CaseDrop';
 import drops from '../../configs/DropsConfig';
 import { addToInventory, removeFromInventory, getUpgrades } from '../../DataStorage';
+import imageCache from '../../utils/ImageCache';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const ITEM_WIDTH = 136; // 120px + 16px gap
+const ITEM_WIDTH = 136;
+const BASE_SPEED = 10; // Base 10 seconds for full spin
 
-const ScrollFrame = ({ money, updateMoney, onFinish, onInventory, onSell, onShowResultChange, caseSpeed = 10, caseData = null }) => {
+const ScrollFrame = React.memo(({ 
+  money, 
+  updateMoney, 
+  onFinish, 
+  onInventory, 
+  onSell, 
+  onShowResultChange, 
+  caseSpeed = null, // Optional override, otherwise uses upgrades
+  caseData = null, 
+  onSpinningChange 
+}) => {
   const scrollRef = useRef(null);
   const [isSpinning, setIsSpinning] = useState(false);
   const [wonItem, setWonItem] = useState(null);
   const [showResult, setShowResult] = useState(false);
   const [rebirthMultiplier, setRebirthMultiplier] = useState(1);
   const [imagesPreloaded, setImagesPreloaded] = useState(false);
+  const [upgrades, setUpgrades] = useState({ caseSpeed: 0 });
+  const [allImagesLoaded, setAllImagesLoaded] = useState(false);
 
   // Use case data drops if provided, otherwise use default drops
-  const baseItems = caseData && caseData.dropWeights ? 
-    Object.keys(caseData.dropWeights).map(name => drops.find(drop => drop.name === name)).filter(Boolean) :
-    drops;
+  const baseItems = useMemo(() => 
+    caseData && caseData.dropWeights ? 
+      Object.keys(caseData.dropWeights).map(name => drops.find(drop => drop.name === name)).filter(Boolean) :
+      drops,
+    [caseData]
+  );
   
+  // Calculate actual case speed based on upgrades
+  const actualCaseSpeed = useMemo(() => {
+    if (caseSpeed !== null) return caseSpeed; // Use override if provided
+    
+    const speedReduction = upgrades.caseSpeed * 0.1;
+    return Math.max(3.5, BASE_SPEED - speedReduction);
+  }, [caseSpeed, upgrades.caseSpeed]);
+
+  // Calculate item count based on speed (faster speed = fewer items needed)
+  const itemCount = useMemo(() => {
+    const baseItems = 100;
+    const speedFactor = actualCaseSpeed / BASE_SPEED;
+    return Math.max(50, Math.floor(baseItems * speedFactor)); // Minimum 50 items
+  }, [actualCaseSpeed]);
+
   // Store items in state to ensure consistency between render and spin
   const [items, setItems] = useState([]);
 
   // Preload all images on component mount
   useEffect(() => {
+    const preloadImages = async () => {
+      await imageCache.preloadAllImages(drops);
+      setImagesPreloaded(true);
+    };
+    
     preloadImages();
   }, []);
 
-  // Generate items once when component mounts or caseData changes
+  // Load upgrades on mount
   useEffect(() => {
-    const generatedItems = generateWeightedItems(300, caseData?.dropWeights);
-    setItems(generatedItems);
-  }, [caseData]);
-
-  // Load rebirth multiplier on mount
-  useEffect(() => {
-    loadRebirthMultiplier();
+    loadUpgrades();
   }, []);
-
-  const preloadImages = async () => {
-    try {
-      const preloadPromises = drops.map(drop => {
-        if (typeof drop.imageSrc === 'number') {
-          // For local assets, we can preload by creating temporary Image components
-          return new Promise((resolve, reject) => {
-            Image.prefetch(Image.resolveAssetSource(drop.imageSrc).uri)
-              .then(resolve)
-              .catch(resolve); // Even if prefetch fails, continue
-          });
-        }
-        return Promise.resolve();
-      });
-
-      await Promise.all(preloadPromises);
-      setImagesPreloaded(true);
-    } catch (error) {
-      console.log('Image preloading completed with some errors');
-      setImagesPreloaded(true); // Continue anyway
-    }
-  };
-
-  const loadRebirthMultiplier = async () => {
-    const upgrades = await getUpgrades();
-    setRebirthMultiplier(upgrades.rebirthMultiplier || 1);
-  };
-
-  // Notify parent when showResult changes
-  React.useEffect(() => {
-    if (typeof onShowResultChange === 'function') {
-      onShowResultChange(showResult);
-    }
-  }, [showResult, onShowResultChange]);
 
   // Function to generate weighted random items for display
   const generateWeightedItems = (count, weights) => {
@@ -102,19 +100,64 @@ const ScrollFrame = ({ money, updateMoney, onFinish, onInventory, onSell, onShow
     
     return weightedItems;
   };
+
+  // Generate items when component mounts or caseData/speed changes
+  useEffect(() => {
+    const generatedItems = generateWeightedItems(itemCount, caseData?.dropWeights);
+    setItems(generatedItems);
+    
+    // Reset loaded state when items change
+    setAllImagesLoaded(false);
+  }, [caseData, itemCount]);
+
+  // Check if all current items are loaded
+  useEffect(() => {
+    if (imagesPreloaded && items.length > 0) {
+      // All images should be preloaded, but we'll double-check the current set
+      const allLoaded = items.every(item => 
+        imageCache.isImageLoaded(item.imageSrc)
+      );
+      setAllImagesLoaded(allLoaded);
+    }
+  }, [imagesPreloaded, items]);
+
+  const loadUpgrades = async () => {
+    const savedUpgrades = await getUpgrades();
+    setUpgrades(savedUpgrades);
+  };
+
+  // Load rebirth multiplier on mount
+  useEffect(() => {
+    loadRebirthMultiplier();
+  }, []);
+
+  // Notify parent when spinning state changes
+  useEffect(() => {
+    onSpinningChange?.(isSpinning);
+  }, [isSpinning, onSpinningChange]);
+
+  const loadRebirthMultiplier = async () => {
+    const upgrades = await getUpgrades();
+    setRebirthMultiplier(upgrades.rebirthMultiplier || 1);
+  };
+
+  // Notify parent when showResult changes
+  useEffect(() => {
+    onShowResultChange?.(showResult);
+  }, [showResult, onShowResultChange]);
   
   const easeOutQuart = (t) => 1 - Math.pow(1 - t, 4);
 
   const handleSpin = async () => {
-    if (isSpinning || !scrollRef.current || !imagesPreloaded || items.length === 0) return;
+    if (isSpinning || !scrollRef.current || !allImagesLoaded || items.length === 0) return;
+    
     setIsSpinning(true);
     setShowResult(false);
     setWonItem(null);
     
     // Reset scroll position
     scrollRef.current.scrollTo({ x: 0, animated: false });
-  
-    // Use the EXISTING items array that's already rendered
+
     // Select winning item FROM THE ACTUAL ITEMS ARRAY
     let winningIndex;
     if (caseData && caseData.dropWeights) {
@@ -157,18 +200,18 @@ const ScrollFrame = ({ money, updateMoney, onFinish, onInventory, onSell, onShow
       // Fallback: random selection from items array
       winningIndex = Math.floor(Math.random() * items.length);
     }
-  
+
     const centerOffset = (SCREEN_WIDTH - 32) / 2 - ITEM_WIDTH / 2;
     const targetScroll = (winningIndex * ITEM_WIDTH) - centerOffset;
-  
-    const duration = caseSpeed * 1000;
+
+    const duration = actualCaseSpeed * 1000; // Use the actual calculated speed
     const startTime = Date.now();
     
     const animate = () => {
       const elapsed = Date.now() - startTime;
       const progress = Math.min(elapsed / duration, 1);
       const easedProgress = easeOutQuart(progress);
-  
+
       scrollRef.current?.scrollTo({ 
         x: targetScroll * easedProgress, 
         animated: false
@@ -184,7 +227,7 @@ const ScrollFrame = ({ money, updateMoney, onFinish, onInventory, onSell, onShow
         });
         
         setIsSpinning(false);
-        const item = items[winningIndex]; // Use item from the actual items array
+        const item = items[winningIndex];
         const acquiredAt = Date.now();
         const fullItem = { ...item, acquiredAt };
         setWonItem(fullItem);
@@ -198,9 +241,8 @@ const ScrollFrame = ({ money, updateMoney, onFinish, onInventory, onSell, onShow
 
   const handleInventory = async () => {
     if (!wonItem) return;
-    // Item is already in inventory, just trigger navigation
-    if (onInventory) onInventory();
-    if (onFinish) onFinish();
+    onInventory?.();
+    onFinish?.();
   };
 
   const handleSell = async () => {
@@ -210,12 +252,23 @@ const ScrollFrame = ({ money, updateMoney, onFinish, onInventory, onSell, onShow
     // Grant value to user with rebirth multiplier
     const sellValue = Math.floor((wonItem.value || 0) * rebirthMultiplier);
     await updateMoney(money + sellValue);
-    if (onSell) onSell(wonItem);
-    if (onFinish) onFinish();
+    onSell?.(wonItem);
+    onFinish?.();
   };
 
   // Calculate sell value with multiplier for display
-  const sellValue = wonItem ? Math.floor((wonItem.value || 0) * rebirthMultiplier) : 0;
+  const sellValue = useMemo(() => 
+    wonItem ? Math.floor((wonItem.value || 0) * rebirthMultiplier) : 0,
+    [wonItem, rebirthMultiplier]
+  );
+
+  // Show speed info in UI
+  const speedInfo = useMemo(() => {
+    if (upgrades.caseSpeed > 0) {
+      return ` (${actualCaseSpeed.toFixed(1)}s)`;
+    }
+    return '';
+  }, [upgrades.caseSpeed, actualCaseSpeed]);
 
   return (
     <View style={styles.container}>
@@ -251,6 +304,7 @@ const ScrollFrame = ({ money, updateMoney, onFinish, onInventory, onSell, onShow
               showsHorizontalScrollIndicator={false}
               scrollEnabled={false}
               contentContainerStyle={styles.scrollContent}
+              removeClippedSubviews={true}
             >
               {items.map((item, index) => (
                 <View key={index} style={styles.itemWrapper}>
@@ -263,19 +317,21 @@ const ScrollFrame = ({ money, updateMoney, onFinish, onInventory, onSell, onShow
         {!showResult && (
           <TouchableOpacity
             onPress={handleSpin}
-            disabled={isSpinning || !imagesPreloaded || items.length === 0}
-            style={[styles.button, (isSpinning || !imagesPreloaded || items.length === 0) && styles.buttonDisabled]}
+            disabled={isSpinning || !allImagesLoaded || items.length === 0}
+            style={[styles.button, (isSpinning || !allImagesLoaded || items.length === 0) && styles.buttonDisabled]}
             activeOpacity={0.8}
           >
             <Text style={styles.buttonText}>
-              {!imagesPreloaded ? 'Loading...' : isSpinning ? 'Opening...' : 'Open Case'}
+              {!allImagesLoaded ? 'Loading Images...' : 
+               isSpinning ? `Opening...${speedInfo}` : 
+               `Open Case${speedInfo}`}
             </Text>
           </TouchableOpacity>
         )}
       </View>
     </View>
   );
-};
+});
 
 const styles = StyleSheet.create({
   container: {
@@ -304,7 +360,7 @@ const styles = StyleSheet.create({
   scrollContainer: {
     position: 'relative',
     marginBottom: 16,
-    height: 152, // Fixed height to prevent layout shift
+    height: 152,
   },
   indicatorLine: {
     position: 'absolute',
@@ -332,7 +388,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 16,
-    height: 152, // Same height as scroll container
+    height: 152,
   },
   resultActions: {
     marginTop: 24,
