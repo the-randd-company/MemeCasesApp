@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 
-const InAppPurchaseShop = () => {
+const IAPShop = () => {
   const packages = [
     { id: 1, name: 'Starter Pack', coins: 1000, price: '$0.99', icon: '💰' },
     { id: 2, name: 'Value Pack', coins: 5000, price: '$4.99', icon: '💎', badge: 'Popular' },
@@ -178,4 +178,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default InAppPurchaseShop;
+export default IAPShop;

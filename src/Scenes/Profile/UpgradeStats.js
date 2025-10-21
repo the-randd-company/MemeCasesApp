@@ -2,7 +2,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
-export const UpgradeStats = ({ caseSpeedLevel, clickerPowerLevel, rebirthMultiplier }) => {
+export const UpgradeStats = ({ caseSpeedLevel, clickerPowerLevel, prestigeMultiplier }) => {
   return (
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>Upgrades</Text>
@@ -20,7 +20,7 @@ export const UpgradeStats = ({ caseSpeedLevel, clickerPowerLevel, rebirthMultipl
         <View style={styles.statCard}>
           <Text style={styles.statCardIcon}>👑</Text>
           <Text style={styles.statCardLabel}>Multiplier</Text>
-          <Text style={styles.statCardValue}>{rebirthMultiplier.toFixed(2)}x</Text>
+          <Text style={styles.statCardValue}>{prestigeMultiplier.toFixed(2)}x</Text>
         </View>
       </View>
     </View>

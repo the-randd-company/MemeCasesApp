@@ -1,25 +1,25 @@
-// RebirthScene.js
+// PrestigeScene.js
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import { getInventory, setInventory, getUpgrades, setUpgrades } from '../DataStorage';
 import {
-  REBIRTH_REQUIREMENT,
+  PRESTIGE_REQUIREMENT,
   calculateWipedValue,
   calculateMultiplierGain,
   getNextMilestone,
-  canRebirth,
-  performRebirth,
+  canPrestige,
+  performPrestige,
 } from './Prestige/PrestigeCalculator';
 
-const RebirthScene = ({ money, updateMoney, onUpgradePurchased }) => {
+const PrestigeScene = ({ money, updateMoney, onUpgradePurchased }) => {
   const [inventory, setInventoryState] = useState([]);
-  const [rebirthMultiplier, setRebirthMultiplier] = useState(1);
-  const [totalRebirths, setTotalRebirths] = useState(0);
+  const [prestigeMultiplier, setPrestigeMultiplier] = useState(1);
+  const [totalPrestiges, setTotalPrestiges] = useState(0);
   const [showInfo, setShowInfo] = useState(false);
 
   useEffect(() => {
     loadInventory();
-    loadRebirthData();
+    loadPrestigeData();
   }, []);
 
   const loadInventory = async () => {
@@ -27,26 +27,26 @@ const RebirthScene = ({ money, updateMoney, onUpgradePurchased }) => {
     setInventoryState(savedInventory || []);
   };
 
-  const loadRebirthData = async () => {
+  const loadPrestigeData = async () => {
     const upgrades = await getUpgrades();
-    setRebirthMultiplier(upgrades.rebirthMultiplier || 1);
-    setTotalRebirths(upgrades.totalRebirths || 0);
+    setPrestigeMultiplier(upgrades.prestigeMultiplier || 1);
+    setTotalPrestiges(upgrades.totalPrestiges || 0);
   };
 
-  const handleRebirth = async () => {
+  const handlePrestige = async () => {
     const wipedValue = calculateWipedValue(inventory);
 
-    if (!canRebirth(wipedValue)) {
+    if (!canPrestige(wipedValue)) {
       Alert.alert(
         'Not Enough Value',
-        `You need $${REBIRTH_REQUIREMENT.toLocaleString()} in wipeable inventory value to prestige.`,
+        `You need $${PRESTIGE_REQUIREMENT.toLocaleString()} in wipeable inventory value to prestige.`,
         [{ text: 'OK' }]
       );
       return;
     }
 
     const multiplierGain = calculateMultiplierGain(wipedValue);
-    const newTotalMultiplier = (rebirthMultiplier + (multiplierGain - 1)).toFixed(2);
+    const newTotalMultiplier = (prestigeMultiplier + (multiplierGain - 1)).toFixed(2);
 
     Alert.alert(
       'Confirm Prestige',
@@ -57,9 +57,9 @@ const RebirthScene = ({ money, updateMoney, onUpgradePurchased }) => {
           text: 'Prestige',
           style: 'destructive',
           onPress: async () => {
-            // Perform rebirth - only keep protected items
-            const protectedItems = performRebirth(inventory);
-            const newTotalRebirths = totalRebirths + 1;
+            // Perform prestige - only keep protected items
+            const protectedItems = performPrestige(inventory);
+            const newTotalPrestiges = totalPrestiges + 1;
 
             // Update inventory
             await setInventory(protectedItems);
@@ -68,28 +68,28 @@ const RebirthScene = ({ money, updateMoney, onUpgradePurchased }) => {
             // Get current upgrades
             const upgrades = await getUpgrades();
             
-            // Reset all upgrades to level 0, but preserve rebirth progress
+            // Reset all upgrades to level 0, but preserve prestige progress
             const updatedUpgrades = {
               // Reset gameplay upgrades to 0
               caseSpeed: 0,
               clickerPower: 0,
-              // Preserve and update rebirth progress
-              rebirthMultiplier: (upgrades.rebirthMultiplier || 1) + (multiplierGain - 1),
-              totalRebirths: newTotalRebirths,
+              // Preserve and update prestige progress
+              prestigeMultiplier: (upgrades.prestigeMultiplier || 1) + (multiplierGain - 1),
+              totalPrestiges: newTotalPrestiges,
             };
 
             await setUpgrades(updatedUpgrades);
             
             // Update local state
-            setRebirthMultiplier(updatedUpgrades.rebirthMultiplier);
-            setTotalRebirths(newTotalRebirths);
+            setPrestigeMultiplier(updatedUpgrades.prestigeMultiplier);
+            setTotalPrestiges(newTotalPrestiges);
 
             // Notify parent component to refresh upgrade states
             if (onUpgradePurchased) {
               onUpgradePurchased();
             }
 
-            updateMoney(Math.trunc(1000*updatedUpgrades.rebirthMultiplier));
+            updateMoney(Math.trunc(1000*updatedUpgrades.prestigeMultiplier));
 
             Alert.alert(
               'Prestige Complete!',
@@ -103,7 +103,7 @@ const RebirthScene = ({ money, updateMoney, onUpgradePurchased }) => {
   };
 
   const wipedValue = calculateWipedValue(inventory);
-  const rebirthAvailable = canRebirth(wipedValue);
+  const prestigeAvailable = canPrestige(wipedValue);
   const multiplierGain = calculateMultiplierGain(wipedValue);
   const nextMilestone = getNextMilestone(wipedValue);
 
@@ -115,11 +115,11 @@ const RebirthScene = ({ money, updateMoney, onUpgradePurchased }) => {
         <View style={styles.statsRow}>
           <View style={styles.stat}>
             <Text style={styles.statLabel}>Multiplier</Text>
-            <Text style={styles.statValue}>{rebirthMultiplier.toFixed(2)}x</Text>
+            <Text style={styles.statValue}>{prestigeMultiplier.toFixed(2)}x</Text>
           </View>
           <View style={styles.stat}>
             <Text style={styles.statLabel}>Prestiges</Text>
-            <Text style={styles.statValue}>{totalRebirths}</Text>
+            <Text style={styles.statValue}>{totalPrestiges}</Text>
           </View>
         </View>
       </View>
@@ -131,19 +131,19 @@ const RebirthScene = ({ money, updateMoney, onUpgradePurchased }) => {
           <Text style={styles.netWorthLabel}>Net Worth</Text>
           <Text style={styles.netWorthValue}>
             ${wipedValue.toLocaleString()}
-            <Text style={styles.netWorthRequirement}> / ${REBIRTH_REQUIREMENT.toLocaleString()}</Text>
+            <Text style={styles.netWorthRequirement}> / ${PRESTIGE_REQUIREMENT.toLocaleString()}</Text>
           </Text>
           <View style={styles.progressBar}>
             <View 
               style={[
                 styles.progressFill,
-                { width: `${Math.min(100, (wipedValue / REBIRTH_REQUIREMENT) * 100)}%` }
+                { width: `${Math.min(100, (wipedValue / PRESTIGE_REQUIREMENT) * 100)}%` }
               ]} 
             />
           </View>
           
           {/* Multiplier Gain Display */}
-          {rebirthAvailable && (
+          {prestigeAvailable && (
             <View style={styles.multiplierDisplay}>
               <Text style={styles.multiplierLabel}>Multiplier Gain</Text>
               <Text style={styles.multiplierValue}>+{multiplierGain.toFixed(2)}x</Text>
@@ -156,38 +156,38 @@ const RebirthScene = ({ money, updateMoney, onUpgradePurchased }) => {
           )}
         </View>
 
-        {/* Rebirth Button */}
+        {/* Prestige Button */}
         <TouchableOpacity
           style={[
-            styles.rebirthButton,
-            rebirthAvailable ? styles.rebirthButtonActive : styles.rebirthButtonDisabled,
+            styles.prestigeButton,
+            prestigeAvailable ? styles.prestigeButtonActive : styles.prestigeButtonDisabled,
           ]}
-          onPress={handleRebirth}
-          disabled={!rebirthAvailable}
+          onPress={handlePrestige}
+          disabled={!prestigeAvailable}
           activeOpacity={0.7}
         >
-          {rebirthAvailable ? (
+          {prestigeAvailable ? (
             <>
-              <Text style={styles.rebirthButtonIcon}>👑</Text>
-              <Text style={styles.rebirthButtonText}>PRESTIGE</Text>
-              <Text style={styles.rebirthButtonSubtext}>
+              <Text style={styles.prestigeButtonIcon}>👑</Text>
+              <Text style={styles.prestigeButtonText}>PRESTIGE</Text>
+              <Text style={styles.prestigeButtonSubtext}>
                 Gain {multiplierGain.toFixed(2)}x Multiplier
               </Text>
-              <Text style={styles.rebirthButtonSubtext}>
-                Total: {(rebirthMultiplier + (multiplierGain - 1)).toFixed(2)}x
+              <Text style={styles.prestigeButtonSubtext}>
+                Total: {(prestigeMultiplier + (multiplierGain - 1)).toFixed(2)}x
               </Text>
             </>
           ) : (
             <>
-              <Text style={styles.rebirthButtonText}>REQUIREMENT NOT MET</Text>
-              <Text style={styles.rebirthButtonSubtext}>
-                Need ${(REBIRTH_REQUIREMENT - wipedValue).toLocaleString()} more
+              <Text style={styles.prestigeButtonText}>REQUIREMENT NOT MET</Text>
+              <Text style={styles.prestigeButtonSubtext}>
+                Need ${(PRESTIGE_REQUIREMENT - wipedValue).toLocaleString()} more
               </Text>
             </>
           )}
         </TouchableOpacity>
 
-        {/* Rebirth Info Dropdown */}
+        {/* Prestige Info Dropdown */}
         <TouchableOpacity 
           style={styles.infoHeader}
           onPress={() => setShowInfo(!showInfo)}
@@ -226,7 +226,7 @@ const RebirthScene = ({ money, updateMoney, onUpgradePurchased }) => {
             <View style={styles.infoItem}>
               <Text style={styles.infoIcon}>💰</Text>
               <Text style={styles.infoText}>
-                <Text style={styles.infoHighlight}>Base Requirement:</Text> ${REBIRTH_REQUIREMENT.toLocaleString()} for 1.2x
+                <Text style={styles.infoHighlight}>Base Requirement:</Text> ${PRESTIGE_REQUIREMENT.toLocaleString()} for 1.2x
               </Text>
             </View>
             <View style={styles.infoItem}>
@@ -342,7 +342,7 @@ const styles = StyleSheet.create({
     color: '#ccc',
     fontStyle: 'italic',
   },
-  rebirthButton: {
+  prestigeButton: {
     backgroundColor: '#374151',
     borderRadius: 12,
     padding: 20,
@@ -351,24 +351,24 @@ const styles = StyleSheet.create({
     minHeight: 120,
     justifyContent: 'center',
   },
-  rebirthButtonActive: {
+  prestigeButtonActive: {
     backgroundColor: '#7c2d12',
   },
-  rebirthButtonDisabled: {
+  prestigeButtonDisabled: {
     backgroundColor: '#374151',
   },
-  rebirthButtonIcon: {
+  prestigeButtonIcon: {
     fontSize: 32,
     marginBottom: 8,
   },
-  rebirthButtonText: {
+  prestigeButtonText: {
     fontSize: 18,
     fontWeight: 'bold',
     color: '#ffffff',
     marginBottom: 4,
     textAlign: 'center',
   },
-  rebirthButtonSubtext: {
+  prestigeButtonSubtext: {
     fontSize: 14,
     color: '#ccc',
     textAlign: 'center',
@@ -423,4 +423,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default RebirthScene;
+export default PrestigeScene;

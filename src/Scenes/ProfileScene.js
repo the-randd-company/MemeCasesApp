@@ -35,15 +35,15 @@ export const ProfileScene = ({ money, onResetData }) => {
   const totalValue = inventory.reduce((sum, item) => sum + (item.value || 0), 0);
   const caseSpeedLevel = upgrades.caseSpeed || 0;
   const clickerPowerLevel = upgrades.clickerPower || 0;
-  const rebirthMultiplier = upgrades.rebirthMultiplier || 1;
-  const totalRebirths = upgrades.totalRebirths || 0;
+  const prestigeMultiplier = upgrades.prestigeMultiplier || 1;
+  const totalPrestiges = upgrades.totalPrestiges || 0;
 
   return (
     <View style={styles.container}>
       <ProfileHeader 
         totalValue={totalValue}
         totalItems={totalItems}
-        totalRebirths={totalRebirths}
+        totalPrestiges={totalPrestiges}
       />
 
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
@@ -59,7 +59,7 @@ export const ProfileScene = ({ money, onResetData }) => {
             <UpgradeStats
               caseSpeedLevel={caseSpeedLevel}
               clickerPowerLevel={clickerPowerLevel}
-              rebirthMultiplier={rebirthMultiplier}
+              prestigeMultiplier={prestigeMultiplier}
             />
 
             <InventoryStats inventory={inventory} />
@@ -67,8 +67,8 @@ export const ProfileScene = ({ money, onResetData }) => {
             <GameProgress
               totalItems={totalItems}
               totalValue={totalValue}
-              totalRebirths={totalRebirths}
-              rebirthMultiplier={rebirthMultiplier}
+              totalPrestiges={totalPrestiges}
+              prestigeMultiplier={prestigeMultiplier}
             />
 
             <ResetButton onResetData={onResetData} />
@@ -78,7 +78,7 @@ export const ProfileScene = ({ money, onResetData }) => {
         {activeTab === 'achievements' && (
           <View style={styles.contentSection}>
             <AchievementList
-              totalRebirths={totalRebirths}
+              totalPrestiges={totalPrestiges}
               totalValue={totalValue}
               totalItems={totalItems}
               caseSpeedLevel={caseSpeedLevel}

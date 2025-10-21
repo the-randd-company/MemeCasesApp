@@ -2,7 +2,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
-export const ProfileHeader = ({ totalValue, totalItems, totalRebirths }) => {
+export const ProfileHeader = ({ totalValue, totalItems, totalPrestiges }) => {
   return (
     <View style={styles.header}>
       <Text style={styles.headerTitle}>👤 Profile</Text>
@@ -17,7 +17,7 @@ export const ProfileHeader = ({ totalValue, totalItems, totalRebirths }) => {
         </View>
         <View style={styles.stat}>
           <Text style={styles.statLabel}>Prestiges</Text>
-          <Text style={styles.statValue}>{totalRebirths}</Text>
+          <Text style={styles.statValue}>{totalPrestiges}</Text>
         </View>
       </View>
     </View>

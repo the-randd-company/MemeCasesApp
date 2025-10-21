@@ -9,12 +9,12 @@ import ScrollFrame from './src/Scenes/CaseOpening/ScrollFrame';
 import BottomNavBar from './src/BottomNavBar';
 import TopBar from './src/TopBar';
 import InventoryScene from './src/Scenes/Inventory';
-import CaseShop from './src/Scenes/Shop';
+import Shop from './src/Scenes/ShopScene';
 import ClickerButton from './src/ClickerButton';
-import UpgradesScene from './src/Scenes/Upgrades';
+import UpgradesScene from './src/Scenes/UpgradesScene';
 import { getMoney, setMoney as setMoneyStorage, getUpgrades, fixCorruptedData, resetAllData } from './src/DataStorage';
 import PrestigeScene from './src/Scenes/PrestigeScene';
-import InAppPurchaseShop from './src/Scenes/InAppPurchaseShop';
+import IAPShop from './src/Scenes/Shop/IAPShop';
 import ProfileScene from './src/Scenes/ProfileScene';
 import useAppImagePreloader from './src/utils/AppImagePreloader';
 
@@ -42,7 +42,7 @@ const formatMoney = (amount) => {
 
 
 const App = () => {
-  const [mainScene, setMainScene] = useState('caseshop');
+  const [mainScene, setMainScene] = useState('shop');
   const [money, setMoney] = useState(1000);
   const [openingCase, setOpeningCase] = useState(false);
   const [showResult, setShowResult] = useState(false);
@@ -52,7 +52,7 @@ const App = () => {
   // Upgrade states
   const [clickerPower, setClickerPower] = useState(1);
   const [caseSpeed, setCaseSpeed] = useState(10);
-  const [rebirthMultiplier, setRebirthMultiplier] = useState(1);
+  const [prestigeMultiplier, setPrestigeMultiplier] = useState(1);
   const [autoClickPower, setAutoClickPower] = useState(0);
 
   // Call the hook at the top level of the component
@@ -139,12 +139,12 @@ const App = () => {
   
   const handleSell = () => {
     setOpeningCase(false);
-    setMainScene('caseshop');
+    setMainScene('shop');
   };
   
   const handleFinish = () => {
     setOpeningCase(false);
-    setMainScene('caseshop');
+    setMainScene('shop');
   };
 
   // Handle spinning state changes from ScrollFrame
@@ -176,7 +176,7 @@ const App = () => {
       
       // Validate and set upgrades with defaults
       setClickerPower(1 + (Number(upgrades.clickerPower) || 0));
-      setRebirthMultiplier(Number(upgrades.rebirthMultiplier) || 1);
+      setPrestigeMultiplier(Number(upgrades.prestigeMultiplier) || 1);
       setAutoClickPower(Number(upgrades.autoClickPower) || 0);
       
       const baseSpeed = 10;
@@ -187,7 +187,7 @@ const App = () => {
       console.error('Error loading upgrades:', error);
       // Set default values if loading fails
       setClickerPower(1);
-      setRebirthMultiplier(1);
+      setPrestigeMultiplier(1);
       setAutoClickPower(0);
       setCaseSpeed(10);
     }
@@ -223,7 +223,7 @@ const App = () => {
 
   const handleMoneyPress = () => {
     setOpeningCase(false);
-    setMainScene('shop');
+    setMainScene('iapshop');
   };
 
   const renderScene = () => {
@@ -246,18 +246,18 @@ const App = () => {
     switch (mainScene) {
       case 'inventory':
         return <InventoryScene onEarnMoney={handleEarnMoney} />;
-      case 'caseshop':
-        return <CaseShop money={money} updateMoney={updateMoney} onCaseBought={openCaseFromShop} />;
+      case 'shop':
+        return <Shop money={money} updateMoney={updateMoney} onCaseBought={openCaseFromShop} />;
       case 'upgrades':
         return <UpgradesScene money={money} updateMoney={updateMoney} onUpgradePurchased={loadUpgrades} />;
       case 'prestige':
         return <PrestigeScene money={money} updateMoney={updateMoney} onUpgradePurchased={loadUpgrades} />;
       case 'profile':
         return <ProfileScene money={money}  onResetData={handleResetAllData}></ProfileScene>
-      case 'shop':
-        return <InAppPurchaseShop />;
+      case 'iapshop':
+        return <IAPShop />;
       default:
-        return <CaseShop money={money} updateMoney={updateMoney} onCaseBought={openCaseFromShop} />;
+        return <Shop money={money} updateMoney={updateMoney} onCaseBought={openCaseFromShop} />;
     }
   };
 
@@ -277,18 +277,18 @@ const App = () => {
           onPress={handleClickerPress} 
           onAutoClick={handleAutoClickEarnings} 
           clickerPower={clickerPower}
-          rebirthMultiplier={rebirthMultiplier}
+          prestigeMultiplier={prestigeMultiplier}
           autoClickPower={autoClickPower}
         />
       )}
 
       {/* Bottom navigation bar */}
       <BottomNavBar
-        activeScene={mainScene === 'shop' ? 'profile' : mainScene}
+        activeScene={mainScene === 'iapshop' ? 'profile' : mainScene}
         onSceneChange={key => {
           if (key === 'cases') {
             setOpeningCase(false);
-            setMainScene('caseshop');
+            setMainScene('shop');
             return;
           }
           if (key === 'profile') {

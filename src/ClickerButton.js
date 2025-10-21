@@ -5,7 +5,7 @@ const ClickerButton = ({
   onPress, 
   earnAmount = 1, 
   clickerPower = 1, 
-  rebirthMultiplier = 1,
+  prestigeMultiplier = 1,
   autoClickPower = 0,
   onAutoClick,
 }) => {
@@ -15,8 +15,8 @@ const ClickerButton = ({
   const effectCount = useRef(0);
   const MAX_EFFECTS = 8;
 
-  // Calculate total click value with rebirth multiplier
-  const totalClickValue = Math.floor(clickerPower * rebirthMultiplier);
+  // Calculate total click value with prestige multiplier
+  const totalClickValue = Math.floor(clickerPower * prestigeMultiplier);
 
   const animatePlusOne = (isAutoClick = false, multiplier = 1) => {
     if (effectCount.current >= MAX_EFFECTS) {

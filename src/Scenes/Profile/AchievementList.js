@@ -16,7 +16,7 @@ const AchievementItem = ({ icon, title, description, progress, status }) => (
   </View>
 );
 
-export const AchievementList = ({ totalRebirths, totalValue, totalItems, caseSpeedLevel }) => {
+export const AchievementList = ({ totalPrestiges, totalValue, totalItems, caseSpeedLevel }) => {
   return (
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>Achievements</Text>
@@ -25,9 +25,9 @@ export const AchievementList = ({ totalRebirths, totalValue, totalItems, caseSpe
         <AchievementItem
           icon="🏆"
           title="First Prestige"
-          description="Complete your first rebirth"
-          progress={totalRebirths > 0 ? styles.achievementCompleted : {}}
-          status={totalRebirths > 0 ? 'Completed!' : 'Not Completed'}
+          description="Complete your first prestige"
+          progress={totalPrestiges > 0 ? styles.achievementCompleted : {}}
+          status={totalPrestiges > 0 ? 'Completed!' : 'Not Completed'}
         />
 
         <AchievementItem
@@ -58,8 +58,8 @@ export const AchievementList = ({ totalRebirths, totalValue, totalItems, caseSpe
           icon="👑"
           title="Prestige Master"
           description="Reach 10 total prestiges"
-          progress={{ width: `${Math.min(100, (totalRebirths / 10) * 100)}%` }}
-          status={`${totalRebirths} / 10 prestiges`}
+          progress={{ width: `${Math.min(100, (totalPrestiges / 10) * 100)}%` }}
+          status={`${totalPrestiges} / 10 prestiges`}
         />
       </View>
     </View>

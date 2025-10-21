@@ -15,9 +15,15 @@ export const GameProgress = ({ totalItems, totalValue, totalPrestiges, prestigeM
       <Text style={styles.sectionTitle}>Game Progress</Text>
       <View style={styles.progressStats}>
         <ProgressItem label="Total Items Collected" value={totalItems} />
-        <ProgressItem label="Total Value Accumulated" value={`$${totalValue.toLocaleString()}`} />
-        <ProgressItem label="Prestige Count" value={totalPrestiges} />
-        <ProgressItem label="Multiplier Bonus" value={`${prestigeMultiplier.toFixed(2)}x`} />
+        <ProgressItem 
+          label="Total Value Accumulated" 
+          value={`$${Number(totalValue || 0).toLocaleString()}`} 
+        />
+        <ProgressItem label="Prestige Count" value={totalPrestiges || 0} />
+        <ProgressItem 
+          label="Multiplier Bonus" 
+          value={`${Number(prestigeMultiplier ?? 0).toFixed(2)}x`} 
+        />
       </View>
     </View>
   );

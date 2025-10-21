@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity } from 'react-native';
-import { subtractMoney } from '../DataStorage';
-import { getAllCases } from '../configs/CasesConfig';
+import { subtractMoney } from '../../DataStorage';
+import { getAllCases } from '../../configs/CasesConfig';
 
 const CaseCard = ({ caseData, userMoney, onBuy }) => {
   const canAfford = userMoney >= caseData.price;
@@ -29,81 +29,39 @@ const CaseCard = ({ caseData, userMoney, onBuy }) => {
   );
 };
 
-const CaseShop = ({ money, updateMoney, onCaseBought }) => {
+const CasesShopScene = ({ money, updateMoney, onCaseBought }) => {
   const handleBuy = async (caseData) => {
     if (!caseData || money < caseData.price) return;
     
-    // Create proper case data structure for ScrollFrame
     const caseForOpening = {
       ...caseData,
-      dropWeights: caseData.dropWeights // Ensure dropWeights is included
+      dropWeights: caseData.dropWeights
     };
     
     const newMoney = await subtractMoney(caseData.price);
     if (newMoney !== null) {
       updateMoney(newMoney);
       if (onCaseBought) {
-        onCaseBought(caseForOpening); // Pass the complete case data
+        onCaseBought(caseForOpening);
       }
     }
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Case Shop</Text>
-        <View style={styles.balanceContainer}>
-          <Text style={styles.balanceLabel}>Balance:</Text>
-          <Text style={styles.balanceAmount}>💰 ${money}</Text>
-        </View>
-      </View>
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.shopGrid}>
-        {getAllCases().map((caseProduct) => (
-          <CaseCard
-            key={caseProduct.id}
-            caseData={caseProduct}
-            userMoney={money}
-            onBuy={handleBuy}
-          />
-        ))}
-      </ScrollView>
-    </View>
+    <ScrollView style={styles.scrollView} contentContainerStyle={styles.shopGrid}>
+      {getAllCases().map((caseProduct) => (
+        <CaseCard
+          key={caseProduct.id}
+          caseData={caseProduct}
+          userMoney={money}
+          onBuy={handleBuy}
+        />
+      ))}
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#1a1a1a',
-  },
-  header: {
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-    backgroundColor: '#2a2a2a',
-    borderBottomWidth: 1,
-    borderBottomColor: '#3a3a3a',
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#ffffff',
-    marginBottom: 8,
-  },
-  balanceContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  balanceLabel: {
-    fontSize: 14,
-    color: '#888',
-    fontWeight: '600',
-  },
-  balanceAmount: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#f59e0b',
-  },
   scrollView: {
     flex: 1,
   },
@@ -168,4 +126,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CaseShop;
+export default CasesShopScene;

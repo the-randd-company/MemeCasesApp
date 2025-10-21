@@ -128,13 +128,6 @@ const UpgradesScene = ({ money, updateMoney, onUpgradePurchased }) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Upgrades</Text>
-        <View style={styles.balanceContainer}>
-          <Text style={styles.balanceLabel}>Balance:</Text>
-          <Text style={styles.balanceAmount}>💰 ${money}</Text>
-        </View>
-      </View>
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.upgradesList}>
         {upgradesData.map((upgrade) => (
           <UpgradeCard key={upgrade.id} upgrade={upgrade} />

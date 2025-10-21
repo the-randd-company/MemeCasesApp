@@ -1,5 +1,5 @@
-// RebirthCalculator.js
-export const REBIRTH_REQUIREMENT = 1000000;
+// PrestigeCalculator.js
+export const PRESTIGE_REQUIREMENT = 1000000;
 export const WIPED_RARITIES = ['common','uncommon', 'rare', 'epic', 'legendary', 'mythic'];
 export const PROTECTED_RARITIES = ['seasonal', 'vaulted', 'special', 'exclusive'];
 
@@ -13,9 +13,9 @@ export const calculateWipedValue = (inventory) => {
 };
 
 export const calculateMultiplierGain = (wipedValue) => {
-  if (wipedValue < REBIRTH_REQUIREMENT) return 0;
+  if (wipedValue < PRESTIGE_REQUIREMENT) return 0;
   
-  const multiplierGain = 1.2 + 0.1 * Math.log2(wipedValue / REBIRTH_REQUIREMENT);
+  const multiplierGain = 1.2 + 0.1 * Math.log2(wipedValue / PRESTIGE_REQUIREMENT);
   return multiplierGain;
 };
 
@@ -25,7 +25,7 @@ export const getNextMilestone = (currentValue) => {
   
   if (nextMultiplier > 5.0) return null;
   
-  const requiredValue = REBIRTH_REQUIREMENT * Math.pow(2, (nextMultiplier - 1.2) / 0.1);
+  const requiredValue = PRESTIGE_REQUIREMENT * Math.pow(2, (nextMultiplier - 1.2) / 0.1);
   return {
     multiplier: nextMultiplier,
     value: Math.ceil(requiredValue)
@@ -33,10 +33,10 @@ export const getNextMilestone = (currentValue) => {
 };
 
 // Validation
-export const canRebirth = (wipedValue) => wipedValue >= REBIRTH_REQUIREMENT;
+export const canPrestige = (wipedValue) => wipedValue >= PRESTIGE_REQUIREMENT;
 
-// Rebirth execution logic
-export const performRebirth = (inventory) => {
+// Prestige execution logic
+export const performPrestige = (inventory) => {
   if (!inventory || !Array.isArray(inventory)) return [];
   
   return inventory.filter(item => 

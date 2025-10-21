@@ -42,23 +42,16 @@ const InventoryScene = ({ onEarnMoney }) => {
   const [selectMode, setSelectMode] = useState(false);
   const [selected, setSelected] = useState([]);
   const [itemLoaded, setItemLoaded] = useState({});
-  const [rebirthMultiplier, setRebirthMultiplier] = useState(1);
   // For animation
   const fadeAnimMap = React.useRef({});
 
   useEffect(() => { 
     loadInventory();
-    loadRebirthMultiplier();
   }, []);
 
   const loadInventory = async () => {
     const items = await getInventory();
     setInventoryState(items);
-  };
-
-  const loadRebirthMultiplier = async () => {
-    const upgrades = await getUpgrades();
-    setRebirthMultiplier(upgrades.rebirthMultiplier || 1);
   };
 
   const saveInventory = async (items) => {
@@ -107,7 +100,7 @@ const InventoryScene = ({ onEarnMoney }) => {
   const deleteSelected = async () => {
     const toDelete = selected.map(i => filteredInventory[i]);
     const baseEarned = toDelete.reduce((sum, item) => sum + (item.value || 0), 0);
-    const earnedWithMultiplier = Math.floor(baseEarned * rebirthMultiplier);
+    const earnedWithMultiplier = Math.floor(baseEarned);
     const newInventory = inventory.filter(invItem => !toDelete.some(selItem=>selItem.acquiredAt===invItem.acquiredAt));
     await saveInventory(newInventory);
     setSelected([]); setSelectMode(false);
@@ -116,7 +109,7 @@ const InventoryScene = ({ onEarnMoney }) => {
   const deleteModalItem = async () => {
     if (!modalItem) return;
     const baseEarned = modalItem.value || 0;
-    const earnedWithMultiplier = Math.floor(baseEarned * rebirthMultiplier);
+    const earnedWithMultiplier = Math.floor(baseEarned);
     const newInventory = inventory.filter(invItem => invItem.acquiredAt!==modalItem.acquiredAt);
     await saveInventory(newInventory);
     setModalItem(null);
@@ -142,7 +135,7 @@ const InventoryScene = ({ onEarnMoney }) => {
         .map(i => filteredInventory[i])
         .reduce((sum, item) => sum + (item?.value || 0), 0)
     : 0;
-  const selectedValue = Math.floor(selectedBaseValue * rebirthMultiplier);
+  const selectedValue = Math.floor(selectedBaseValue);
 
   return (
     <View style={styles.container}>
@@ -342,7 +335,7 @@ const InventoryScene = ({ onEarnMoney }) => {
               <Text style={styles.modalMeta}>Rarity: <Text style={{color:modalItem.rarityColor}}>{modalItem.rarity}</Text></Text>
               {modalItem.value!=null && (
                 <Text style={styles.modalMeta}>
-                  Value: ${Math.floor((modalItem.value || 0) * rebirthMultiplier)}
+                  Value: ${Math.floor(modalItem.value || 0)}
                 </Text>
               )}
               <TouchableOpacity style={styles.modalDelete} onPress={deleteModalItem} activeOpacity={0.8}>

@@ -25,7 +25,7 @@ const ScrollFrame = React.memo(({
   const [isSpinning, setIsSpinning] = useState(false);
   const [wonItem, setWonItem] = useState(null);
   const [showResult, setShowResult] = useState(false);
-  const [rebirthMultiplier, setRebirthMultiplier] = useState(1);
+  const [prestigeMultiplier, setPrestigeMultiplier] = useState(1);
   const [imagesPreloaded, setImagesPreloaded] = useState(false);
   const [upgrades, setUpgrades] = useState({ caseSpeed: 0 });
   const [allImagesLoaded, setAllImagesLoaded] = useState(false);
@@ -136,9 +136,9 @@ const ScrollFrame = React.memo(({
     setUpgrades(savedUpgrades);
   };
 
-  // Load rebirth multiplier on mount
+  // Load prestige multiplier on mount
   useEffect(() => {
-    loadRebirthMultiplier();
+    loadPrestigeMultiplier();
   }, []);
 
   // Notify parent when spinning state changes
@@ -146,9 +146,9 @@ const ScrollFrame = React.memo(({
     onSpinningChange?.(isSpinning);
   }, [isSpinning, onSpinningChange]);
 
-  const loadRebirthMultiplier = async () => {
+  const loadPrestigeMultiplier = async () => {
     const upgrades = await getUpgrades();
-    setRebirthMultiplier(upgrades.rebirthMultiplier || 1);
+    setPrestigeMultiplier(upgrades.prestigeMultiplier || 1);
   };
 
   // Notify parent when showResult changes
@@ -264,7 +264,7 @@ const ScrollFrame = React.memo(({
     if (!wonItem) return;
     // Remove from inventory when selling
     await removeFromInventory({ id: wonItem.id, acquiredAt: wonItem.acquiredAt });
-    // Grant value to user with rebirth multiplier
+    // Grant value to user with prestige multiplier
     const sellValue = Math.floor(wonItem.value || 0);
     await updateMoney(money + sellValue);
     onSell?.(wonItem);
@@ -274,7 +274,7 @@ const ScrollFrame = React.memo(({
   // Calculate sell value with multiplier for display
   const sellValue = useMemo(() => 
     wonItem ? Math.floor(wonItem.value || 0) : 0,
-    [wonItem, rebirthMultiplier]
+    [wonItem, prestigeMultiplier]
   );
 
   // Show speed info in UI
