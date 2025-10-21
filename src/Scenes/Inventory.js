@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, Animated, Modal } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, Animated, Modal, Dimensions } from 'react-native';
 import { getInventory, setInventory, getUpgrades } from '../DataStorage';
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const CARDS_PER_ROW = 4;
+const HORIZONTAL_PADDING = 16; // 8px on each side
+const GAP = 8; // Space between cards
+
 
 const InventoryItem = ({ item, onPress, onLongPress, selected, selectionMode, fadeAnim, onImageLoad }) => {
   let source;
@@ -429,12 +434,12 @@ const styles = StyleSheet.create({
   inventoryGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    padding: 8,
+    paddingHorizontal: HORIZONTAL_PADDING,
+    gap: GAP,
   },
   itemCard: {
-    width: '18%',
+    width: (SCREEN_WIDTH - (HORIZONTAL_PADDING * 2) - (GAP * (CARDS_PER_ROW - 1))) / CARDS_PER_ROW,
     aspectRatio: 1,
-    margin: '1%',
     borderRadius: 8,
     borderWidth: 3,
     overflow: 'hidden',

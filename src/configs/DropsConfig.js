@@ -1,9 +1,19 @@
+import imageCache from '../utils/ImageCache';
+
 const drops = [
   /*
 
   VAULTED!?
 
   */
+ 
+  {
+    name: 'Phenomenal Penguin',
+    imageSrc: require('../img/memes/PhenomenalPenguin.jpg'),
+    rarity: 'Vaulted',
+    rarityColor: '#8b5cf6',
+    value: 23456789 // D/M/Y of epstein buying island
+  },
   {
     name: 'Epstein Files',
     imageSrc: require('../img/memes/EpsteinFiles.jpg'),

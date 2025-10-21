@@ -6,6 +6,8 @@ const STORAGE_KEYS = {
   UPGRADES: '@user_upgrades',
   PRESTIGE_MULTIPLIER: '@prestige_multiplier',
   TOTAL_PRESTIGES: '@total_prestiges',
+  HAS_SEEN_TUTORIAL: '@has_seen_tutorial',
+  CASES_OPENED: '@cases_opened', // Add this line
 };
 
 // Centralized default values
@@ -19,9 +21,71 @@ const DEFAULTS = {
     prestigeMultiplier: 1,
     totalPrestiges: 0,
   },
+  HAS_SEEN_TUTORIAL: false,
+  CASES_OPENED: 0, // Add this line
 };
 
-// Reset all data to default values
+// Add these functions to DataStorage.js
+export const getHasSeenTutorial = async () => {
+  try {
+    const value = await AsyncStorage.getItem(STORAGE_KEYS.HAS_SEEN_TUTORIAL);
+    if (value !== null) {
+      return value === 'true';
+    }
+    // Initialize with default if not exists
+    await AsyncStorage.setItem(STORAGE_KEYS.HAS_SEEN_TUTORIAL, DEFAULTS.HAS_SEEN_TUTORIAL.toString());
+    return DEFAULTS.HAS_SEEN_TUTORIAL;
+  } catch (error) {
+    console.error('Error getting tutorial status:', error);
+    return DEFAULTS.HAS_SEEN_TUTORIAL;
+  }
+};
+
+export const setHasSeenTutorial = async (hasSeen) => {
+  try {
+    await AsyncStorage.setItem(STORAGE_KEYS.HAS_SEEN_TUTORIAL, hasSeen.toString());
+    return true;
+  } catch (error) {
+    console.error('Error setting tutorial status:', error);
+    return false;
+  }
+};
+
+export const getCasesOpened = async () => {
+  try {
+    const value = await AsyncStorage.getItem('totalCasesOpened');
+    return value !== null ? parseInt(value, 10) : 0;
+  } catch (error) {
+    console.error('Error getting cases opened:', error);
+    return 0;
+  }
+};
+
+export const setCasesOpened = async (count) => {
+  try {
+    const validCount = validateNumber(count, DEFAULTS.CASES_OPENED);
+    await AsyncStorage.setItem(STORAGE_KEYS.CASES_OPENED, validCount.toString());
+    console.log('Cases opened saved to storage:', validCount);
+    return true;
+  } catch (error) {
+    console.error('Error setting cases opened:', error);
+    return false;
+  }
+};
+
+export const incrementCasesOpened = async () => {
+  try {
+    const currentCount = await getCasesOpened();
+    const newCount = currentCount + 1;
+    await setCasesOpened(newCount);
+    return newCount;
+  } catch (error) {
+    console.error('Error incrementing cases opened:', error);
+    return null;
+  }
+};
+
+// Update resetAllData function to include cases opened
 export const resetAllData = async () => {
   try {
     console.log('Resetting all data to defaults...');
@@ -29,6 +93,8 @@ export const resetAllData = async () => {
     await AsyncStorage.setItem(STORAGE_KEYS.MONEY, DEFAULTS.MONEY.toString());
     await AsyncStorage.setItem(STORAGE_KEYS.INVENTORY, JSON.stringify(DEFAULTS.INVENTORY));
     await AsyncStorage.setItem(STORAGE_KEYS.UPGRADES, JSON.stringify(DEFAULTS.UPGRADES));
+    await AsyncStorage.setItem(STORAGE_KEYS.HAS_SEEN_TUTORIAL, DEFAULTS.HAS_SEEN_TUTORIAL.toString());
+    await AsyncStorage.setItem(STORAGE_KEYS.CASES_OPENED, DEFAULTS.CASES_OPENED.toString());
     
     // If you're using separate keys for prestige data, reset those too
     try {
@@ -243,6 +309,7 @@ export const fixCorruptedData = async () => {
     console.log('Running corruption check and auto-fix...');
     await getMoney();
     await getUpgrades();
+    await getCasesOpened(); // Add this line
     console.log('Corruption check complete');
     return true;
   } catch (error) {
@@ -251,6 +318,7 @@ export const fixCorruptedData = async () => {
   }
 };
 
+// Update the default export to include the new functions
 export default {
   getMoney,
   setMoney,
@@ -265,4 +333,7 @@ export default {
   clearAllData,
   fixCorruptedData,
   resetAllData,
+  getCasesOpened, // Add this
+  setCasesOpened, // Add this
+  incrementCasesOpened, // Add this
 };

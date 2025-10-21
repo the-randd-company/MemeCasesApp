@@ -1,4 +1,4 @@
-// ProfileScene.js (Refactored)
+// ProfileScene.js (Fixed)
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
 import { getInventory, getUpgrades } from '../DataStorage';
@@ -13,10 +13,11 @@ import { GameProgress } from './Profile/GameProgress';
 import { AchievementList } from './Profile/AchievementList';
 import { ResetButton } from './Profile/ResetButton';
 
-export const ProfileScene = ({ money, onResetData }) => {
+export const ProfileScene = ({ money, onResetData, totalCasesOpened }) => { // Add totalCasesOpened as prop
   const [inventory, setInventory] = useState([]);
   const [upgrades, setUpgrades] = useState({});
   const [activeTab, setActiveTab] = useState('stats');
+  
 
   useEffect(() => {
     loadProfileData();
@@ -25,7 +26,7 @@ export const ProfileScene = ({ money, onResetData }) => {
   const loadProfileData = async () => {
     const savedInventory = await getInventory();
     const savedUpgrades = await getUpgrades();
-    
+
     setInventory(savedInventory || []);
     setUpgrades(savedUpgrades || {});
   };
@@ -82,6 +83,7 @@ export const ProfileScene = ({ money, onResetData }) => {
               totalValue={totalValue}
               totalItems={totalItems}
               caseSpeedLevel={caseSpeedLevel}
+              totalCasesOpened={totalCasesOpened} // Use the prop here
             />
           </View>
         )}

@@ -7,6 +7,13 @@ const LEGENDARY_CASE_IMAGE = require('../img/memes/SixSeven.jpg');
 // Import drops config for case contents
 import drops from './DropsConfig';
 
+const countTotalVaultedDrops = (dropsConfig) => {
+  return dropsConfig.filter(dropItem => dropItem.rarity === 'Vaulted').length;
+}
+
+const totalVaulted = countTotalVaultedDrops(drops);
+const VAULTED_RARITY = totalVaulted > 0 ? (1 / (totalVaulted * 10)) : 0;
+
 export const CASES_CONFIG = [
   {
     "id": "common_case",
@@ -25,8 +32,6 @@ export const CASES_CONFIG = [
       'Left Shark': 25/3,
       'Drake Reacts No': 25/3,
       'Be Like Bill': 25/3,
-      //Vaulted:
-      'Epstein Files': 1/1000,
     }
   },
   {
@@ -49,8 +54,6 @@ export const CASES_CONFIG = [
       'Good Guy Greg': 25/3,
       'Awesome Penguin': 25/3,
       'Nobody...': 25/3,
-      //Vaulted:
-      'Epstein Files': 1/1000,
     }
   },
   {
@@ -72,8 +75,6 @@ export const CASES_CONFIG = [
       //Epic: 25,
       'Ice Bucket Challenge': 25/2,
       'Awkward Monkey': 25/2,
-      //Vaulted:
-      'Epstein Files': 1/1000,
     }
   },
   {
@@ -95,8 +96,6 @@ export const CASES_CONFIG = [
       //Legendary: 25,
       'Rick Roll': 30/2,
       'Brr Brr Patapim': 30/2,
-      //Vaulted:
-      'Epstein Files': 1/1000,
     }
   },
   {
@@ -119,8 +118,6 @@ export const CASES_CONFIG = [
       'Bad Luck Brian': 20/3,
       'Bongo Cat': 20/3,
       'Dat Boi': 20/3,
-      //Vaulted:
-      'Epstein Files': 1/1000,
     }
   },
   {
@@ -142,7 +139,8 @@ export const CASES_CONFIG = [
       'Italiano Combiniano': 35/4,
       'Troll Face': 35/4,
       //Vaulted:
-      'Epstein Files': 1/1000,
+      'Epstein Files': VAULTED_RARITY,
+      'Phenomenal Penguin': VAULTED_RARITY,
     }
   }
 ];

@@ -1,3 +1,4 @@
+// Updated App.js
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   View,
@@ -12,10 +13,21 @@ import InventoryScene from './src/Scenes/Inventory';
 import Shop from './src/Scenes/ShopScene';
 import ClickerButton from './src/ClickerButton';
 import UpgradesScene from './src/Scenes/UpgradesScene';
-import { getMoney, setMoney as setMoneyStorage, getUpgrades, fixCorruptedData, resetAllData } from './src/DataStorage';
+import { 
+  getMoney, 
+  setMoney as setMoneyStorage, 
+  getUpgrades, 
+  fixCorruptedData, 
+  resetAllData,
+  getHasSeenTutorial,
+  setHasSeenTutorial,
+  incrementCasesOpened,
+  getCasesOpened,
+} from './src/DataStorage';
 import PrestigeScene from './src/Scenes/PrestigeScene';
 import IAPShop from './src/Scenes/Shop/IAPShop';
 import ProfileScene from './src/Scenes/ProfileScene';
+import TutorialScene from './src/Scenes/TutorialScene'; // Add this import
 import useAppImagePreloader from './src/utils/AppImagePreloader';
 
 // Improved formatMoney function with better NaN protection
@@ -39,8 +51,6 @@ const formatMoney = (amount) => {
   return formatted + suffixes[tier];
 };
 
-
-
 const App = () => {
   const [mainScene, setMainScene] = useState('shop');
   const [money, setMoney] = useState(1000);
@@ -48,6 +58,8 @@ const App = () => {
   const [showResult, setShowResult] = useState(false);
   const [currentCase, setCurrentCase] = useState(null);
   const [isSpinning, setIsSpinning] = useState(false);
+  const [showTutorial, setShowTutorial] = useState(false); 
+  const [totalCasesOpened, setTotalCasesOpened] = useState(0);
 
   // Upgrade states
   const [clickerPower, setClickerPower] = useState(1);
@@ -71,12 +83,33 @@ const App = () => {
       // Then load the corrected data
       await loadMoney();
       await loadUpgrades();
+
+      await loadCasesOpened();
+
+      // Check if user has seen tutorial
+      const hasSeenTutorial = await getHasSeenTutorial();
+      if (!hasSeenTutorial) {
+        setShowTutorial(true);
+      }
     } catch (error) {
       console.error('Error initializing app:', error);
       // Set default money if initialization fails
       setMoney(1000);
+      setTotalCasesOpened(0);
     }
   };
+
+  // Add this new function to load cases opened count
+const loadCasesOpened = async () => {
+  try {
+    // You'll need to create this function in DataStorage.js
+    const casesOpened = await getCasesOpened();
+    setTotalCasesOpened(casesOpened || 0);
+  } catch (error) {
+    console.error('Error loading cases opened:', error);
+    setTotalCasesOpened(0);
+  }
+};
 
   const loadMoney = async () => {
     try {
@@ -118,9 +151,22 @@ const App = () => {
       // After resetting, reload the data to update the state
       await loadMoney();
       await loadUpgrades();
+      await loadCasesOpened();
+      // Show tutorial again after reset
+      setShowTutorial(true);
       console.log('All data reset and state updated');
     } catch (error) {
       console.error('Error resetting data:', error);
+    }
+  };
+
+  const handleTutorialComplete = async () => {
+    try {
+      await setHasSeenTutorial(true);
+      setShowTutorial(false);
+    } catch (error) {
+      console.error('Error saving tutorial status:', error);
+      setShowTutorial(false);
     }
   };
 
@@ -129,6 +175,13 @@ const App = () => {
     setCurrentCase(caseData);
     setOpeningCase(true);
     setMainScene('caseopening');
+
+    // Increment the cases opened counter and update state
+    incrementCasesOpened().then(newCount => {
+      if (newCount !== null) {
+        setTotalCasesOpened(newCount);
+      }
+    });
   };
 
   // Handlers after roll result actions
@@ -226,6 +279,15 @@ const App = () => {
     setMainScene('iapshop');
   };
 
+  // Show tutorial if it hasn't been seen
+  if (showTutorial) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <TutorialScene onContinue={handleTutorialComplete} />
+      </SafeAreaView>
+    );
+  }
+
   const renderScene = () => {
     if (openingCase) {
       return (
@@ -253,7 +315,7 @@ const App = () => {
       case 'prestige':
         return <PrestigeScene money={money} updateMoney={updateMoney} onUpgradePurchased={loadUpgrades} />;
       case 'profile':
-        return <ProfileScene money={money}  onResetData={handleResetAllData}></ProfileScene>
+        return <ProfileScene money={money} onResetData={handleResetAllData} totalCasesOpened={totalCasesOpened}/>;
       case 'iapshop':
         return <IAPShop />;
       default:

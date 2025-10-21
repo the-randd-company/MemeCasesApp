@@ -7,6 +7,7 @@ import LTOShop from './Shop/LTOShop';
 import IAPShop from './Shop/IAPShop';
 
 const ShopScene = ({ money, updateMoney, onCaseBought }) => {
+  
   const [activeCategory, setActiveCategory] = useState('cases');
 
   const renderCategoryContent = () => {

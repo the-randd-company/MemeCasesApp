@@ -15,10 +15,6 @@ const IAPShop = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>💳 Shop</Text>
-        <Text style={styles.headerSubtitle}>Purchase coins to boost your progress</Text>
-      </View>
 
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
         {packages.map((pkg) => (
