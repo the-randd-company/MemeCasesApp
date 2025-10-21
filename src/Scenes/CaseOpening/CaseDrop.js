@@ -2,7 +2,7 @@
 import React, { useState, useMemo } from 'react';
 import { View, StyleSheet, Image, Animated } from 'react-native';
 import imageCache from '../../utils/ImageCache';
-import DataStorage from './DataStorage';
+import DataStorage from '../../DataStorage';
 
 const CaseDrop = React.memo(({ dropImage }) => {
   const [imageLoaded, setImageLoaded] = useState(false);

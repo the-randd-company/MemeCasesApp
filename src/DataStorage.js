@@ -51,13 +51,21 @@ export const setHasSeenTutorial = async (hasSeen) => {
   }
 };
 
+// In DataStorage.js - FIX the getCasesOpened function
 export const getCasesOpened = async () => {
   try {
-    const value = await AsyncStorage.getItem('totalCasesOpened');
-    return value !== null ? parseInt(value, 10) : 0;
+    // FIX: Use STORAGE_KEYS.CASES_OPENED instead of hardcoded string
+    const value = await AsyncStorage.getItem(STORAGE_KEYS.CASES_OPENED);
+    if (value !== null) {
+      const parsed = parseInt(value, 10);
+      return isNaN(parsed) ? DEFAULTS.CASES_OPENED : parsed;
+    }
+    // Initialize with default if not exists
+    await AsyncStorage.setItem(STORAGE_KEYS.CASES_OPENED, DEFAULTS.CASES_OPENED.toString());
+    return DEFAULTS.CASES_OPENED;
   } catch (error) {
     console.error('Error getting cases opened:', error);
-    return 0;
+    return DEFAULTS.CASES_OPENED;
   }
 };
 
@@ -75,9 +83,10 @@ export const setCasesOpened = async (count) => {
 
 export const incrementCasesOpened = async () => {
   try {
-    const currentCount = await getCasesOpened();
+    const currentCount = await getCasesOpened(); // This now uses the fixed function
     const newCount = currentCount + 1;
     await setCasesOpened(newCount);
+    console.log('Incremented cases opened:', currentCount, '->', newCount); // Debug
     return newCount;
   } catch (error) {
     console.error('Error incrementing cases opened:', error);

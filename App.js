@@ -80,12 +80,13 @@ const App = () => {
       // First fix any corrupted data
       await fixCorruptedData();
       
-      // Then load the corrected data
+      // Load cases opened BEFORE other data to ensure it's available
+      await loadCasesOpened();
+      
+      // Then load the rest of the data
       await loadMoney();
       await loadUpgrades();
-
-      await loadCasesOpened();
-
+  
       // Check if user has seen tutorial
       const hasSeenTutorial = await getHasSeenTutorial();
       if (!hasSeenTutorial) {
@@ -99,11 +100,11 @@ const App = () => {
     }
   };
 
-  // Add this new function to load cases opened count
+// Update the loadCasesOpened function in App.js
 const loadCasesOpened = async () => {
   try {
-    // You'll need to create this function in DataStorage.js
     const casesOpened = await getCasesOpened();
+    console.log('Loaded cases opened:', casesOpened); // Debug log
     setTotalCasesOpened(casesOpened || 0);
   } catch (error) {
     console.error('Error loading cases opened:', error);
