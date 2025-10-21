@@ -165,9 +165,6 @@ const InventoryScene = ({ onEarnMoney }) => {
           <TouchableOpacity style={[styles.dropdownButton, {backgroundColor:'#10b981'}]} onPress={deleteSelected} activeOpacity={0.8}>
             <Text style={{color:'#fff'}}>
               Sell: ${selectedValue}
-              {rebirthMultiplier > 1 && (
-                <Text style={{fontSize: 11}}> ({rebirthMultiplier.toFixed(2)}x)</Text>
-              )}
             </Text>
           </TouchableOpacity>
         )}
@@ -346,17 +343,11 @@ const InventoryScene = ({ onEarnMoney }) => {
               {modalItem.value!=null && (
                 <Text style={styles.modalMeta}>
                   Value: ${Math.floor((modalItem.value || 0) * rebirthMultiplier)}
-                  {rebirthMultiplier > 1 && (
-                    <Text style={styles.multiplierText}> ({rebirthMultiplier.toFixed(2)}x)</Text>
-                  )}
                 </Text>
               )}
               <TouchableOpacity style={styles.modalDelete} onPress={deleteModalItem} activeOpacity={0.8}>
                 <Text style={{color:'#fff'}}>
-                  Sell Item For ${Math.floor((modalItem.value || 0) * rebirthMultiplier)}
-                  {rebirthMultiplier > 1 && (
-                    <Text style={{fontSize: 12}}> ({rebirthMultiplier.toFixed(2)}x)</Text>
-                  )}
+                  Sell Item For ${Math.floor(modalItem.value || 0)}
                 </Text>
               </TouchableOpacity>
             </>}
@@ -458,11 +449,10 @@ const styles = StyleSheet.create({
   itemImageContainer: {
     width: '100%',
     height: '100%',
-    padding: 4,
   },
   itemImage: {
-    width: '100%',
-    height: '100%',
+    width: '125%',
+    height: '125%',
   },
   emptyContainer: {
     flex: 1,

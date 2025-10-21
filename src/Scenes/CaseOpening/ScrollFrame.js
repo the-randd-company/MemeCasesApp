@@ -157,97 +157,102 @@ const ScrollFrame = React.memo(({
   }, [showResult, onShowResultChange]);
   
   const easeOutQuart = (t) => 1 - Math.pow(1 - t, 4);
-
   const handleSpin = async () => {
-    if (isSpinning || !scrollRef.current || !allImagesLoaded || items.length === 0) return;
-    
-    setIsSpinning(true);
-    setShowResult(false);
-    setWonItem(null);
-    
-    // Reset scroll position
-    scrollRef.current.scrollTo({ x: 0, animated: false });
+  if (isSpinning || !scrollRef.current || !allImagesLoaded || items.length === 0) return;
+  
+  setIsSpinning(true);
+  setShowResult(false);
+  setWonItem(null);
+  
+  // Reset scroll position
+  scrollRef.current.scrollTo({ x: 0, animated: false });
 
-    // Select winning item FROM THE ACTUAL ITEMS ARRAY
-    let winningIndex;
-    if (caseData && caseData.dropWeights) {
-      // Use weighted selection from the actual items array
-      const weights = caseData.dropWeights;
-      const totalWeight = Object.values(weights).reduce((sum, weight) => sum + weight, 0);
-      let random = Math.random() * totalWeight;
-      
-      let selectedItemName = null;
-      for (const itemName in weights) {
-        random -= weights[itemName];
-        if (random <= 0) {
-          selectedItemName = itemName;
-          break;
-        }
+  // Select winning item FROM THE ACTUAL ITEMS ARRAY
+  let winningIndex;
+  if (caseData && caseData.dropWeights) {
+    // Use weighted selection from the actual items array
+    const weights = caseData.dropWeights;
+    const totalWeight = Object.values(weights).reduce((sum, weight) => sum + weight, 0);
+    let random = Math.random() * totalWeight;
+    
+    let selectedItemName = null;
+    for (const itemName in weights) {
+      random -= weights[itemName];
+      if (random <= 0) {
+        selectedItemName = itemName;
+        break;
       }
-      
-      // Fallback if no item selected
-      if (!selectedItemName) {
-        selectedItemName = baseItems[Math.floor(Math.random() * baseItems.length)].name;
-      }
-      
-      // Find ALL occurrences of the selected item in the actual items array
-      const allOccurrences = items
-        .map((item, index) => item.name === selectedItemName ? index : -1)
-        .filter(index => index !== -1);
-      
-      // Pick a random occurrence that's far enough in the list for dramatic effect
-      const minStartIndex = Math.floor(items.length * 0.6);
-      const validOccurrences = allOccurrences.filter(index => index >= minStartIndex);
-      
-      if (validOccurrences.length > 0) {
-        winningIndex = validOccurrences[Math.floor(Math.random() * validOccurrences.length)];
-      } else {
-        winningIndex = allOccurrences.length > 0 
-          ? allOccurrences[allOccurrences.length - 1] 
-          : Math.floor(items.length * 0.8);
-      }
-    } else {
-      // Fallback: random selection from items array
-      winningIndex = Math.floor(Math.random() * items.length);
     }
-
-    const centerOffset = (SCREEN_WIDTH - 32) / 2 - ITEM_WIDTH / 2;
-    const targetScroll = (winningIndex * ITEM_WIDTH) - centerOffset;
-
-    const duration = actualCaseSpeed * 1000; // Use the actual calculated speed
-    const startTime = Date.now();
     
-    const animate = () => {
-      const elapsed = Date.now() - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      const easedProgress = easeOutQuart(progress);
+    // Fallback if no item selected
+    if (!selectedItemName) {
+      selectedItemName = baseItems[Math.floor(Math.random() * baseItems.length)].name;
+    }
+    
+    // Find ALL occurrences of the selected item in the actual items array
+    const allOccurrences = items
+      .map((item, index) => item.name === selectedItemName ? index : -1)
+      .filter(index => index !== -1);
+    
+    // Pick a random occurrence that's far enough in the list for dramatic effect
+    const minStartIndex = Math.floor(items.length * 0.6);
+    const validOccurrences = allOccurrences.filter(index => index >= minStartIndex);
+    
+    if (validOccurrences.length > 0) {
+      winningIndex = validOccurrences[Math.floor(Math.random() * validOccurrences.length)];
+    } else {
+      winningIndex = allOccurrences.length > 0 
+        ? allOccurrences[allOccurrences.length - 1] 
+        : Math.floor(items.length * 0.8);
+    }
+  } else {
+    // Fallback: random selection from items array
+    winningIndex = Math.floor(Math.random() * items.length);
+  }
 
+  const centerOffset = (SCREEN_WIDTH - 32) / 2 - ITEM_WIDTH / 2;
+  const targetScroll = (winningIndex * ITEM_WIDTH) - centerOffset;
+
+  const duration = actualCaseSpeed * 1000; // Use the actual calculated speed
+  const startTime = Date.now();
+  
+  const animate = () => {
+    const elapsed = Date.now() - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    const easedProgress = easeOutQuart(progress);
+
+    scrollRef.current?.scrollTo({ 
+      x: targetScroll * easedProgress, 
+      animated: false
+    });
+    
+    if (progress < 1) {
+      requestAnimationFrame(animate);
+    } else {
+      // Ensure final scroll position is exact
       scrollRef.current?.scrollTo({ 
-        x: targetScroll * easedProgress, 
+        x: targetScroll, 
         animated: false
       });
       
-      if (progress < 1) {
-        requestAnimationFrame(animate);
-      } else {
-        // Ensure final scroll position is exact
-        scrollRef.current?.scrollTo({ 
-          x: targetScroll, 
-          animated: false
-        });
-        
+      // Set the won item first
+      const item = items[winningIndex];
+      const acquiredAt = Date.now();
+      const fullItem = { ...item, acquiredAt };
+      setWonItem(fullItem);
+      
+      // Add to inventory immediately on roll finish
+      addToInventory(fullItem);
+      
+      // Set spinning to false and show result after a brief delay
+      setTimeout(() => {
         setIsSpinning(false);
-        const item = items[winningIndex];
-        const acquiredAt = Date.now();
-        const fullItem = { ...item, acquiredAt };
-        setWonItem(fullItem);
-        // Add to inventory immediately on roll finish
-        addToInventory(fullItem);
-        setTimeout(() => { setShowResult(true); }, 500);
-      }
-    };
-    requestAnimationFrame(animate);
+        setShowResult(true);
+      }, 500);
+    }
   };
+  requestAnimationFrame(animate);
+};
 
   const handleInventory = async () => {
     if (!wonItem) return;
@@ -260,7 +265,7 @@ const ScrollFrame = React.memo(({
     // Remove from inventory when selling
     await removeFromInventory({ id: wonItem.id, acquiredAt: wonItem.acquiredAt });
     // Grant value to user with rebirth multiplier
-    const sellValue = Math.floor((wonItem.value || 0) * rebirthMultiplier);
+    const sellValue = Math.floor(wonItem.value || 0);
     await updateMoney(money + sellValue);
     onSell?.(wonItem);
     onFinish?.();
@@ -268,7 +273,7 @@ const ScrollFrame = React.memo(({
 
   // Calculate sell value with multiplier for display
   const sellValue = useMemo(() => 
-    wonItem ? Math.floor((wonItem.value || 0) * rebirthMultiplier) : 0,
+    wonItem ? Math.floor(wonItem.value || 0) : 0,
     [wonItem, rebirthMultiplier]
   );
 
@@ -298,9 +303,6 @@ const ScrollFrame = React.memo(({
               <TouchableOpacity style={[styles.button, { backgroundColor: '#10b981' }]} onPress={handleSell}>
                 <Text style={styles.buttonText}>
                   Sell Item (${sellValue})
-                  {rebirthMultiplier > 1 && (
-                    <Text style={styles.multiplierText}> {rebirthMultiplier.toFixed(2)}x</Text>
-                  )}
                 </Text>
               </TouchableOpacity>
             </View>

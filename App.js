@@ -13,8 +13,9 @@ import CaseShop from './src/Scenes/Shop';
 import ClickerButton from './src/ClickerButton';
 import UpgradesScene from './src/Scenes/Upgrades';
 import { getMoney, setMoney as setMoneyStorage, getUpgrades, fixCorruptedData, resetAllData } from './src/DataStorage';
-import PrestigeScene from './src/Scenes/Rebirthing/Rebirth';
+import PrestigeScene from './src/Scenes/PrestigeScene';
 import InAppPurchaseShop from './src/Scenes/InAppPurchaseShop';
+import ProfileScene from './src/Scenes/ProfileScene';
 import useAppImagePreloader from './src/utils/AppImagePreloader';
 
 // Improved formatMoney function with better NaN protection
@@ -252,6 +253,7 @@ const App = () => {
       case 'prestige':
         return <PrestigeScene money={money} updateMoney={updateMoney} onUpgradePurchased={loadUpgrades} />;
       case 'profile':
+        return <ProfileScene money={money}  onResetData={handleResetAllData}></ProfileScene>
       case 'shop':
         return <InAppPurchaseShop />;
       default:
@@ -291,7 +293,7 @@ const App = () => {
           }
           if (key === 'profile') {
             setOpeningCase(false);
-            setMainScene('shop');
+            setMainScene('profile');
             return;
           }
           if (openingCase) {

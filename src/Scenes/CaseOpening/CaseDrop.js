@@ -88,13 +88,13 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   dropImage: {
-    width: '100%',
-    height: '100%',
+    width: '125%',
+    height: '125%',
   },
   placeholder: {
     position: 'absolute',
-    width: '100%',
-    height: '100%',
+    width: '125%',
+    height: '125%',
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0,0,0,0.1)',

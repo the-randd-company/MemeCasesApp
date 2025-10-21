@@ -63,7 +63,7 @@ const UpgradesScene = ({ money, updateMoney, onUpgradePurchased }) => {
       name: 'Case Opening Speed',
       description: `Reduces case opening time by 0.1s (Current: ${getCaseSpeedDuration().toFixed(1)}s)`,
       baseCost: 400,
-      costMultiplier: 1.05,
+      costMultiplier: 1.1,
       currentLevel: upgrades.caseSpeed,
       maxLevel: 65, // Max 6.5 seconds reduction (0.1 * 65 = 6.5s, so 10 - 6.5 = 3.5s minimum)
     },

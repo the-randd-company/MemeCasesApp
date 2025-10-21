@@ -1,7 +1,7 @@
 // RebirthScene.js
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert, ScrollView } from 'react-native';
-import { getInventory, setInventory, getUpgrades, setUpgrades } from '../../DataStorage';
+import { getInventory, setInventory, getUpgrades, setUpgrades } from '../DataStorage';
 import {
   REBIRTH_REQUIREMENT,
   calculateWipedValue,
@@ -9,7 +9,7 @@ import {
   getNextMilestone,
   canRebirth,
   performRebirth,
-} from './RebirthCalculator';
+} from './Prestige/PrestigeCalculator';
 
 const RebirthScene = ({ money, updateMoney, onUpgradePurchased }) => {
   const [inventory, setInventoryState] = useState([]);
