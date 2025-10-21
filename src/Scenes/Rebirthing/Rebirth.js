@@ -50,7 +50,7 @@ const RebirthScene = ({ money, updateMoney, onUpgradePurchased }) => {
 
     Alert.alert(
       'Confirm Prestige',
-      `This will:\n• Wipe all common, rare, legendary, and mythic items\n• Reset ALL upgrades (case speed, clicker power)\n• Grant permanent ${multiplierGain.toFixed(2)}x click multiplier\n\nYour seasonal/vaulted items will be preserved.`,
+      `This will:\n• Wipe all common, rare, legendary, and other overworld items\n• Reset ALL upgrades (case speed, clicker power)\n• Grant permanent ${multiplierGain.toFixed(2)}x click multiplier\n\nYour seasonal/vaulted items will be preserved.`,
       [
         { text: 'Cancel', style: 'cancel' },
         {
@@ -88,6 +88,8 @@ const RebirthScene = ({ money, updateMoney, onUpgradePurchased }) => {
             if (onUpgradePurchased) {
               onUpgradePurchased();
             }
+
+            updateMoney(Math.trunc(1000*updatedUpgrades.rebirthMultiplier));
 
             Alert.alert(
               'Prestige Complete!',
@@ -231,12 +233,6 @@ const RebirthScene = ({ money, updateMoney, onUpgradePurchased }) => {
               <Text style={styles.infoIcon}>📈</Text>
               <Text style={styles.infoText}>
                 <Text style={styles.infoHighlight}>Scaling:</Text> Each doubling adds +0.1x multiplier
-              </Text>
-            </View>
-            <View style={styles.infoItem}>
-              <Text style={styles.infoIcon}>✨</Text>
-              <Text style={styles.infoText}>
-                <Text style={styles.infoHighlight}>Stacking:</Text> All multipliers multiply together
               </Text>
             </View>
           </View>

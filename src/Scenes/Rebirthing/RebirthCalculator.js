@@ -1,6 +1,6 @@
 // RebirthCalculator.js
 export const REBIRTH_REQUIREMENT = 1000000;
-export const WIPED_RARITIES = ['common', 'rare', 'legendary', 'mythic'];
+export const WIPED_RARITIES = ['common','uncommon', 'rare', 'epic', 'legendary', 'mythic'];
 export const PROTECTED_RARITIES = ['seasonal', 'vaulted', 'special', 'exclusive'];
 
 // Core calculations

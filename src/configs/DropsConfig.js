@@ -1,107 +1,320 @@
-// Export meme drop config based on files in src/img/memes
-
-// Rarity color defined for visual ease ...
-// upon rarity of "Seasonal", when implemented, would otherwise be problematic.
-
 const drops = [
+  /*
+
+  MYTHICS 
+
+  */
   {
-    name: 'Snoop Dogg',
-    imageSrc: require('../img/memes/SnoopDogg.jpg'),
-    rarity: 'Common',
-    rarityColor: '#b8a01a',
-    value: 420,
+    name: 'Troll Face',
+    imageSrc: require('../img/memes/TrollFace.jpg'),
+    rarity: 'Mythic',
+    rarityColor: '#c31429',
+    value: 9900900
   },
   {
-    name: 'Pepe the Frog',
-    imageSrc: require('../img/memes/PepeTheFrog.jpg'),
-    rarity: 'Common',
-    rarityColor: '#b8a01a',
-    value: 665,
-  },
-  
-  {
-    name: 'Brain Overload',
-    imageSrc: require('../img/memes/BrainOverload.jpg'),
-    rarity: 'Common',
-    rarityColor: '#b8a01a',
-    value: 1111,
+    name: 'Italiano Combiniano',
+    imageSrc: require('../img/memes/ItalianoCombiniano.jpg'),
+    rarity: 'Mythic',
+    rarityColor: '#c31429',
+    value: 7650000
   },
   {
-    name: 'Overly Attached Girlfriend',
-    imageSrc: require('../img/memes/OverlyAttachedGirlfriend.jpg'),
-    rarity: 'Common',
-    rarityColor: '#b8a01a',
-    value: 1311,
+    name: 'Evil Kermit',
+    imageSrc: require('../img/memes/EvilKermit.jpg'),
+    rarity: 'Mythic',
+    rarityColor: '#c31429',
+    value: 6000000
   },
   {
-    name: 'Drake Reacts No',
-    imageSrc: require('../img/memes/DrakeReactsNo.jpg'),
-    rarity: 'Uncommon',
-    rarityColor: '#444400',
-    value: 5750,
+    name: 'Dat Boi',
+    imageSrc: require('../img/memes/DatBoi.jpg'),
+    rarity: 'Mythic',
+    rarityColor: '#c31429',
+    value: 4000000
   },
   {
-    name: 'Grumpy Cat',
-    imageSrc: require('../img/memes/GrumpyCat.jpg'),
-    rarity: 'Uncommon',
-    rarityColor: '#444400',
-    value: 8930,
+    name: 'Bongo Cat',
+    imageSrc: require('../img/memes/BongoCat.jpg'),
+    rarity: 'Mythic',
+    rarityColor: '#c31429',
+    value: 3500000
   },
   {
-    name: 'Success Kid',
-    imageSrc: require('../img/memes/SuccessKid.jpg'),
-    rarity: 'Uncommon',
-    rarityColor: '#444400',
-    value: 14302,
+    name: 'Bad Luck Brian',
+    imageSrc: require('../img/memes/BadLuckBrian.jpg'),
+    rarity: 'Mythic',
+    rarityColor: '#c31429',
+    value: 3250000
   },
-  
+  /*
+
+  [ LEGENDARY ] 475k$
+
+  */
   {
-    name: 'Quandale Dingle',
-    imageSrc: require('../img/memes/QuandaleDingle.jpg'),
-    rarity: 'Rare',
-    rarityColor: '#4169e1',
-    value: 44489,
-  },
-  {
-    name: 'Original Doge',
-    imageSrc: require('../img/memes/OriginalDoge.jpg'),
-    rarity: 'Rare',
-    rarityColor: '#4169e1',
-    value: 89000,
+    name: 'SixSeven Kid',
+    imageSrc: require('../img/memes/SixSeven.jpg'),
+    rarity: 'Legendary',
+    rarityColor: '#c4a82c',
+    value: 676767
   },
   {
-    name: 'This Is Fine',
-    imageSrc: require('../img/memes/ThisIsFine.jpg'),
-    rarity: 'Epic',
-    rarityColor: '#d946ef',
-    value: 500000,
+    name: 'Awkward Penguin',
+    imageSrc: require('../img/memes/AwkwardPenguin.jpg'),
+    rarity: 'Legendary',
+    rarityColor: '#c4a82c',
+    value: 589999
+  },
+  {
+    name: 'Disaster Girl',
+    imageSrc: require('../img/memes/DisasterGirl.jpg'),
+    rarity: 'Legendary',
+    rarityColor: '#c4a82c',
+    value: 490000
+  },
+  {
+    name: 'Bombadiro Crocodilo',
+    imageSrc: require('../img/memes/BombadiroCrocodilo.png'),
+    rarity: 'Legendary',
+    rarityColor: '#c4a82c',
+    value: 484848
+  },
+  {
+    name: 'Ancient Aliens',
+    imageSrc: require('../img/memes/AncientAliens.jpg'),
+    rarity: 'Legendary',
+    rarityColor: '#c4a82c',
+    value: 467500
   },
   {
     name: 'Rick Roll',
     imageSrc: require('../img/memes/RickRoll.png'),
     rarity: 'Legendary',
-    rarityColor: '#d946ef',
-    value: 2500000,
+    rarityColor: '#c4a82c',
+    value: 444444
   },
   {
-    name: 'SixSeven Kid',
-    imageSrc: require('../img/memes/SixSeven.jpg'),
-    rarity: 'Mythic',
-    rarityColor: '#FF0000',
-    value: 6750000,
-  },{
-    name: 'Bad Luck Brian',
-    imageSrc: require('../img/memes/BadLuckBrian.jpg'),
-    rarity: 'Mythic',
-    rarityColor: '#FF0000',
-    value: 8500000,
+    name: 'Brr Brr Patapim',
+    imageSrc: require('../img/memes/BrrBrrPatapim.jpg'),
+    rarity: 'Legendary',
+    rarityColor: '#c4a82c',
+    value: 421250
+  },
+  /*
+
+  [ EPIC ] 87.5k$
+
+  */
+  {
+    name: 'Happy Hank',
+    imageSrc: require('../img/memes/HappyHank.jpg'),
+    rarity: 'Epic',
+    rarityColor: '#720047',
+    value: 84420
   },
   {
-    name: 'Troll Face',
-    imageSrc: require('../img/memes/TrollFace.jpg'),
-    rarity: 'Mythic',
-    rarityColor: '#FF0000',
-    value: 9900000,
+    name: 'Kermit Sips Tea',
+    imageSrc: require('../img/memes/KermitSipsTea.jpg'),
+    rarity: 'Epic',
+    rarityColor: '#720047',
+    value: 83303
+  },
+  {
+    name: 'Ice Bucket Challenge',
+    imageSrc: require('../img/memes/IceBucketChallenge.jpg'),
+    rarity: 'Epic',
+    rarityColor: '#720047',
+    value: 82500
+  },
+  {
+    name: 'Distracted Boyfriend',
+    imageSrc: require('../img/memes/DistractedBoyfriend.jpg'),
+    rarity: 'Epic',
+    rarityColor: '#720047',
+    value: 82222
+  },
+  {
+    name: 'Awkward Monkey',
+    imageSrc: require('../img/memes/AwkwardMonkey.jpg'),
+    rarity: 'Epic',
+    rarityColor: '#720047',
+    value: 81000
+  },
+  {
+    name: 'Chimpanzini Bananini',
+    imageSrc: require('../img/memes/ChimpanziniBananini.jpg'),
+    rarity: 'Epic',
+    rarityColor: '#720047',
+    value: 78990
+  },
+  {
+    name: 'This Is Fine',
+    imageSrc: require('../img/memes/ThisIsFine.jpg'),
+    rarity: 'Epic',
+    rarityColor: '#720047',
+    value: 77500
+  },
+  /*
+
+  [ RARE ] 22.5k$
+
+  */
+  {
+    name: 'Sad Pablo',
+    imageSrc: require('../img/memes/SadPablo.jpg'),
+    rarity: 'Rare',
+    rarityColor: '#0f3284',
+    value: 22543,
+  },
+  {
+    name: 'Original Doge',
+    imageSrc: require('../img/memes/OriginalDoge.jpg'),
+    rarity: 'Rare',
+    rarityColor: '#0f3284',
+    value: 22222
+  },
+  {
+    name: 'Good Guy Greg',
+    imageSrc: require('../img/memes/GoodGuyGreg.jpg'),
+    rarity: 'Rare',
+    rarityColor: '#0f3284',
+    value: 21765
+  },
+  {
+    name: 'Awesome Penguin',
+    imageSrc: require('../img/memes/AwesomePenguin.jpg'),
+    rarity: 'Rare',
+    rarityColor: '#0f3284',
+    value: 21100
+  },
+  {
+    name: 'Capuchino Assassino',
+    imageSrc: require('../img/memes/CapuchinoAssassino.jpg'),
+    rarity: 'Rare',
+    rarityColor: '#0f3284',
+    value: 20999
+  },
+  {
+    name: 'Quandale Dingle',
+    imageSrc: require('../img/memes/QuandaleDingle.jpg'),
+    rarity: 'Rare',
+    rarityColor: '#0f3284',
+    value: 20555
+  },
+  {
+    name: 'Grumpy Cat',
+    imageSrc: require('../img/memes/GrumpyCat.jpg'),
+    rarity: 'Rare',
+    rarityColor: '#0f3284',
+    value: 20000
+  },
+  /*
+
+  [ UNCOMMON ] - 7.5k$
+
+  */
+  {
+    name: 'Success Kid',
+    imageSrc: require('../img/memes/SuccessKid.jpg'),
+    rarity: 'Uncommon',
+    rarityColor: '#29915a',
+    value: 8150
+  },
+  {
+    name: 'Dramatic Chipmunk',
+    imageSrc: require('../img/memes/DramaticChipmunk.png'),
+    rarity: 'Uncommon',
+    rarityColor: '#29915a',
+    value: 8000
+  },
+  {
+    name: 'Hard To Swallow Pills',
+    imageSrc: require('../img/memes/HardToSwallowPills.jpg'),
+    rarity: 'Uncommon',
+    rarityColor: '#29915a',
+    value: 7760
+  },
+  {
+    name: 'Bombini Guzzini',
+    imageSrc: require('../img/memes/BombiniGuzzini.jpg'),
+    rarity: 'Uncommon',
+    rarityColor: '#29915a',
+    value: 7500
+  },
+  {
+    name: 'Insanity Wolf',
+    imageSrc: require('../img/memes/InsanityWolf.jpg'),
+    rarity: 'Uncommon',
+    rarityColor: '#29915a',
+    value: 7350
+  },
+  {
+    name: 'Be Like Bill',
+    imageSrc: require('../img/memes/BeLikeBill.jpg'),
+    rarity: 'Uncommon',
+    rarityColor: '#29915a',
+    value: 7200
+  },
+  {
+    name: 'Drake Reacts No',
+    imageSrc: require('../img/memes/DrakeReactsNo.jpg'),
+    rarity: 'Uncommon',
+    rarityColor: '#29915a',
+    value: 6500
+  },
+  /*
+
+  [ COMMON ] 420-1000
+
+  */
+  {
+    name: 'Overly Attached Girlfriend',
+    imageSrc: require('../img/memes/OverlyAttachedGirlfriend.jpg'),
+    rarity: 'Common',
+    rarityColor: '#aaa8a0',
+    value: 599
+  },
+  {
+    name: 'Burbaloni Luliloli',
+    imageSrc: require('../img/memes/BurbaloniLuliloli.jpg'),
+    rarity: 'Common',
+    rarityColor: '#aaa8a0',
+    value: 589
+  },
+  {
+    name: 'High Expectations',
+    imageSrc: require('../img/memes/HighExpectations.jpg'),
+    rarity: 'Common',
+    rarityColor: '#aaa8a0',
+    value: 584
+  },
+  {
+    name: 'Foul Frog',
+    imageSrc: require('../img/memes/FoulFrog.jpg'),
+    rarity: 'Common',
+    rarityColor: '#aaa8a0',
+    value: 559
+  },
+  {
+    name: 'Pepe the Frog',
+    imageSrc: require('../img/memes/PepeTheFrog.jpg'),
+    rarity: 'Common',
+    rarityColor: '#aaa8a0',
+    value: 459
+  },
+  {
+    name: 'Snoop Dogg',
+    imageSrc: require('../img/memes/SnoopDogg.jpg'),
+    rarity: 'Common',
+    rarityColor: '#aaa8a0',
+    value: 420
+  },
+  {
+    name: 'Brain Overload',
+    imageSrc: require('../img/memes/BrainOverload.jpg'),
+    rarity: 'Common',
+    rarityColor: '#aaa8a0',
+    value: 259
   },
 ];
 

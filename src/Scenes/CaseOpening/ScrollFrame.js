@@ -78,6 +78,16 @@ const ScrollFrame = React.memo(({
     const weightedItems = [];
     const totalWeight = Object.values(weights).reduce((sum, weight) => sum + weight, 0);
     
+    // Get only the items that are in this case's weights
+    const caseItems = Object.keys(weights)
+      .map(name => drops.find(drop => drop.name === name))
+      .filter(Boolean);
+    
+    // If no valid items found, return empty array
+    if (caseItems.length === 0) {
+      return [];
+    }
+    
     for (let i = 0; i < count; i++) {
       let random = Math.random() * totalWeight;
       let selectedItem = null;
@@ -90,9 +100,9 @@ const ScrollFrame = React.memo(({
         }
       }
       
-      // Fallback if no item selected
+      // Fallback: pick random item FROM THE CASE ITEMS ONLY
       if (!selectedItem) {
-        selectedItem = drops[Math.floor(Math.random() * drops.length)];
+        selectedItem = caseItems[Math.floor(Math.random() * caseItems.length)];
       }
       
       weightedItems.push(selectedItem);
