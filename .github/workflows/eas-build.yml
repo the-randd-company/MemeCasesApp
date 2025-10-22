@@ -3,8 +3,6 @@ name: EAS Build
 on:
   push:
     branches: [main, master]
-  pull_request:
-    branches: [main, master]
 
 env:
   NODE_VERSION: '18'
@@ -28,16 +26,12 @@ jobs:
     - name: Install dependencies
       run: npm ci
 
-    - name: Setup Expo
+    - name: Setup Expo and EAS
       uses: expo/expo-github-action@v8
       with:
         expo-version: latest
+        eas-version: latest
         token: ${{ secrets.EXPO_TOKEN }}
-
-    - name: Install EAS CLI
-      run: npm install -g @expo/eas-cli
 
     - name: Build on EAS
       run: eas build --platform ios --non-interactive --no-wait
-      env:
-        EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
