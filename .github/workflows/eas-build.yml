@@ -1,0 +1,43 @@
+name: EAS Build
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+env:
+  NODE_VERSION: '18'
+
+jobs:
+  build:
+    name: Install and build
+    runs-on: ubuntu-latest
+    environment: production
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Setup Expo
+      uses: expo/expo-github-action@v8
+      with:
+        expo-version: latest
+        token: ${{ secrets.EXPO_TOKEN }}
+
+    - name: Install EAS CLI
+      run: npm install -g @expo/eas-cli
+
+    - name: Build on EAS
+      run: eas build --platform ios --non-interactive --no-wait
+      env:
+        EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
