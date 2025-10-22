@@ -1,15 +1,109 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, Animated } from 'react-native';
 import { subtractMoney } from '../../DataStorage';
 import { getAllCases } from '../../configs/CasesConfig';
 
 const CaseCard = ({ caseData, userMoney, onBuy }) => {
+  const [showDescription, setShowDescription] = useState(false);
+  const [imageFadeAnim] = useState(new Animated.Value(1));
+  const [descriptionFadeAnim] = useState(new Animated.Value(0));
+  const [scaleAnim] = useState(new Animated.Value(1));
+  
   const canAfford = userMoney >= caseData.price;
+
+  const toggleDescription = () => {
+    if (showDescription) {
+      // Show image with multiple animations
+      Animated.parallel([
+        Animated.timing(imageFadeAnim, {
+          toValue: 1,
+          duration: 600,
+          useNativeDriver: true,
+        }),
+        Animated.timing(descriptionFadeAnim, {
+          toValue: 0,
+          duration: 400,
+          useNativeDriver: true,
+        }),
+        Animated.spring(scaleAnim, {
+          toValue: 1,
+          tension: 50,
+          friction: 7,
+          useNativeDriver: true,
+        })
+      ]).start();
+    } else {
+      // Show description with multiple animations
+      Animated.parallel([
+        Animated.timing(imageFadeAnim, {
+          toValue: 0,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+        Animated.timing(descriptionFadeAnim, {
+          toValue: 1,
+          duration: 800,
+          delay: 200,
+          useNativeDriver: true,
+        }),
+        Animated.spring(scaleAnim, {
+          toValue: 0.95,
+          tension: 50,
+          friction: 7,
+          useNativeDriver: true,
+        })
+      ]).start();
+    }
+    setShowDescription(!showDescription);
+  };
+
   return (
     <View style={styles.caseCard}>
-      <View style={styles.caseImageContainer}>
-        <Image source={caseData.imageSrc} style={styles.caseImage} resizeMode="contain" />
-      </View>
+      <TouchableOpacity 
+        style={styles.caseImageContainer}
+        onPress={toggleDescription}
+        activeOpacity={0.9}
+      >
+        {/* Image with fade animation */}
+        <Animated.View 
+          style={[
+            styles.imageWrapper, 
+            { 
+              opacity: imageFadeAnim,
+              transform: [{ scale: scaleAnim }]
+            }
+          ]}
+        >
+          <Image 
+            source={caseData.imageSrc} 
+            style={styles.caseImage} 
+            resizeMode="contain" 
+          />
+        </Animated.View>
+        
+        {/* Description with fade animation */}
+        <Animated.View 
+          style={[
+            styles.descriptionContainer,
+            { 
+              opacity: descriptionFadeAnim,
+              transform: [{ scale: scaleAnim }]
+            }
+          ]}
+        >
+          <Text style={styles.descriptionTitle}>About this Case</Text>
+          <Text style={styles.descriptionText}>
+            {caseData.description || 'No description available.'}
+          </Text>
+          {caseData.dropWeights && (
+            <Text style={styles.rarityHint}>
+                good luck!
+            </Text>
+          )}
+          <Text style={styles.tapHint}>Tap to view case</Text>
+        </Animated.View>
+      </TouchableOpacity>
+      
       <Text style={styles.caseName}>{caseData.name}</Text>
       <View style={styles.priceContainer}>
         <Text style={styles.priceIcon}>💰</Text>
@@ -83,10 +177,56 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 12,
     padding: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    overflow: 'hidden',
+  },
+  imageWrapper: {
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'absolute',
   },
   caseImage: {
     width: '100%',
     height: '100%',
+  },
+  descriptionContainer: {
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 12,
+    position: 'absolute',
+  },
+  descriptionTitle: {
+    color: '#f59e0b',
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  descriptionText: {
+    color: '#ffffff',
+    fontSize: 13,
+    textAlign: 'center',
+    lineHeight: 18,
+    marginBottom: 8,
+  },
+  rarityHint: {
+    color: '#888',
+    fontSize: 12,
+    fontStyle: 'italic',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  tapHint: {
+    color: '#f59e0b',
+    fontSize: 11,
+    fontWeight: '600',
+    textAlign: 'center',
+    marginTop: 4,
   },
   caseName: {
     fontSize: 20,

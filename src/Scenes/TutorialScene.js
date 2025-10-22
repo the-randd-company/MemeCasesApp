@@ -230,7 +230,7 @@ const TutorialScene = ({ onContinue }) => {
       rarity: 'Vaulted',
       rarityColor: '#8b5cf6',
       value: 20041998,
-      imageSrc: require('../img/memes/EpsteinFiles.jpg')
+      imageSrc: require('../img/memes/vaulted/EpsteinFiles.webp')
     },
     {
       name: 'Phenomenal Penguin',
@@ -238,7 +238,7 @@ const TutorialScene = ({ onContinue }) => {
       rarityColor: '#8b5cf6',
       value: 9999999,
       // You'll need to add this image to your assets
-      imageSrc: require('../img/memes/PhenomenalPenguin.jpg') // Use a placeholder or actual image
+      imageSrc: require('../img/memes/vaulted/PhenomenalPenguin.webp') // Use a placeholder or actual image
     },
     { isPlaceholder: true },
     { isPlaceholder: true }
